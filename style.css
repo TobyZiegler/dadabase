@@ -1,0 +1,444 @@
+/* ============================================================
+   Dad-a-Base — Retro Style Sheet
+   Vibe: 1970s wood-paneled basement meets old-school computer terminal
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Special+Elite&family=VT323&display=swap');
+
+/* ── CSS Variables ─────────────────────────────────────── */
+:root {
+    --wood:        #8B4513;
+    --wood-light:  #A0522D;
+    --wood-dark:   #5C2E00;
+    --cream:       #FFF8DC;
+    --amber:       #FFB300;
+    --amber-glow:  #FFC107;
+    --green:       #39FF14;
+    --red:         #FF4444;
+    --terminal:    #0D0D0D;
+    --panel:       #1A1A1A;
+    --border:      #D4A017;
+    --shadow:      rgba(0,0,0,0.6);
+}
+
+/* ── Reset & Base ──────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background-color: var(--wood-dark);
+    background-image:
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(0,0,0,0.05) 2px,
+            rgba(0,0,0,0.05) 4px
+        ),
+        repeating-linear-gradient(
+            180deg,
+            transparent,
+            transparent 20px,
+            rgba(255,255,255,0.02) 20px,
+            rgba(255,255,255,0.02) 40px
+        );
+    font-family: 'Special Elite', cursive;
+    color: var(--cream);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+header {
+    text-align: center;
+    padding: 30px 20px 20px;
+    border-bottom: 4px double var(--border);
+    margin-bottom: 30px;
+    position: relative;
+}
+
+header::before, header::after {
+    content: '★ ★ ★';
+    font-size: 1.2rem;
+    color: var(--amber);
+    display: block;
+    letter-spacing: 10px;
+    margin-bottom: 8px;
+}
+
+.site-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(1.4rem, 5vw, 2.8rem);
+    color: var(--amber);
+    text-shadow:
+        3px 3px 0 var(--wood-dark),
+        0 0 20px rgba(255,179,0,0.5),
+        0 0 40px rgba(255,179,0,0.2);
+    letter-spacing: 4px;
+    line-height: 1.4;
+    animation: flicker 6s infinite;
+}
+
+.site-subtitle {
+    font-family: 'VT323', monospace;
+    font-size: 1.4rem;
+    color: var(--green);
+    letter-spacing: 3px;
+    margin-top: 10px;
+    text-shadow: 0 0 8px var(--green);
+}
+
+@keyframes flicker {
+    0%, 95%, 100% { opacity: 1; }
+    96% { opacity: 0.8; }
+    97% { opacity: 1; }
+    98% { opacity: 0.6; }
+    99% { opacity: 1; }
+}
+
+/* ── Navigation ─────────────────────────────────────────── */
+nav {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+nav a {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.6rem;
+    color: var(--terminal);
+    background: var(--amber);
+    border: 3px solid var(--wood-dark);
+    padding: 10px 16px;
+    text-decoration: none;
+    box-shadow: 4px 4px 0 var(--wood-dark);
+    transition: all 0.1s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+nav a:hover {
+    background: var(--amber-glow);
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--wood-dark);
+}
+
+nav a:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 var(--wood-dark);
+}
+
+/* ── Terminal Panel (main content wrapper) ──────────────── */
+.terminal-panel {
+    background: var(--terminal);
+    border: 4px solid var(--border);
+    border-radius: 4px;
+    box-shadow:
+        inset 0 0 30px rgba(0,0,0,0.8),
+        0 0 20px rgba(212,160,23,0.3),
+        8px 8px 0 var(--wood-dark);
+    max-width: 900px;
+    margin: 0 auto 30px;
+    padding: 30px;
+    position: relative;
+}
+
+.terminal-panel::before {
+    content: '● ● ●';
+    position: absolute;
+    top: 10px;
+    left: 16px;
+    color: var(--amber);
+    font-size: 0.8rem;
+    letter-spacing: 6px;
+    opacity: 0.6;
+}
+
+/* ── Section Headers ────────────────────────────────────── */
+.section-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.8rem;
+    color: var(--amber);
+    text-align: center;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--wood);
+    letter-spacing: 2px;
+}
+
+/* ── Search Bar ─────────────────────────────────────────── */
+.search-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.search-bar input {
+    flex: 1;
+    min-width: 200px;
+    background: #111;
+    border: 2px solid var(--amber);
+    color: var(--green);
+    font-family: 'VT323', monospace;
+    font-size: 1.4rem;
+    padding: 10px 14px;
+    outline: none;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 0 0 6px rgba(57,255,20,0.2);
+    letter-spacing: 2px;
+}
+
+.search-bar input::placeholder { color: rgba(57,255,20,0.3); }
+.search-bar input:focus { border-color: var(--green); box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 0 0 10px rgba(57,255,20,0.4); }
+
+/* ── Buttons ────────────────────────────────────────────── */
+.btn {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.55rem;
+    padding: 12px 18px;
+    border: 3px solid var(--wood-dark);
+    cursor: pointer;
+    box-shadow: 4px 4px 0 var(--wood-dark);
+    transition: all 0.1s;
+    text-decoration: none;
+    display: inline-block;
+    letter-spacing: 1px;
+}
+
+.btn:hover  { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--wood-dark); }
+.btn:active { transform: translate(2px,2px);   box-shadow: 2px 2px 0 var(--wood-dark); }
+
+.btn-amber  { background: var(--amber);  color: var(--terminal); }
+.btn-green  { background: var(--green);  color: var(--terminal); }
+.btn-red    { background: var(--red);    color: #fff; }
+.btn-gray   { background: #555;          color: #fff; }
+
+/* ── Random Joke Button ─────────────────────────────────── */
+.random-section {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.btn-random {
+    font-size: 0.7rem;
+    padding: 16px 28px;
+    background: var(--amber);
+    color: var(--terminal);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 4px 4px 0 var(--wood-dark), 0 0 0 rgba(255,179,0,0); }
+    50%       { box-shadow: 4px 4px 0 var(--wood-dark), 0 0 20px rgba(255,179,0,0.4); }
+}
+
+/* ── Joke Card ──────────────────────────────────────────── */
+.joke-card {
+    background: #111;
+    border: 2px solid var(--wood);
+    border-left: 6px solid var(--amber);
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    transition: border-left-color 0.2s;
+    position: relative;
+}
+
+.joke-card:hover { border-left-color: var(--green); }
+
+.joke-setup {
+    font-family: 'Special Elite', cursive;
+    font-size: 1.1rem;
+    color: var(--cream);
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+.joke-punchline {
+    font-family: 'VT323', monospace;
+    font-size: 1.5rem;
+    color: var(--amber);
+    text-shadow: 0 0 8px rgba(255,179,0,0.4);
+    letter-spacing: 1px;
+}
+
+.joke-meta {
+    font-family: 'VT323', monospace;
+    font-size: 0.9rem;
+    color: #555;
+    margin-top: 10px;
+    letter-spacing: 1px;
+}
+
+/* ── Vote Buttons ───────────────────────────────────────── */
+.vote-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.vote-btn {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.5rem;
+    padding: 8px 12px;
+    border: 2px solid var(--wood-dark);
+    cursor: pointer;
+    box-shadow: 3px 3px 0 var(--wood-dark);
+    transition: all 0.1s;
+    background: #1a1a1a;
+}
+
+.vote-btn:hover  { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 var(--wood-dark); }
+.vote-btn:active { transform: translate(1px,1px);   box-shadow: 1px 1px 0 var(--wood-dark); }
+
+.vote-btn.ha    { color: var(--green); border-color: var(--green); }
+.vote-btn.groan { color: var(--red);   border-color: var(--red); }
+.vote-btn.ha:hover    { background: rgba(57,255,20,0.1); }
+.vote-btn.groan:hover { background: rgba(255,68,68,0.1); }
+
+.vote-count {
+    font-family: 'VT323', monospace;
+    font-size: 1rem;
+    color: #777;
+    letter-spacing: 2px;
+}
+
+/* ── Random Joke Display ────────────────────────────────── */
+#random-joke-display {
+    display: none;
+    background: #0a0a0a;
+    border: 3px solid var(--amber);
+    padding: 30px;
+    margin-bottom: 30px;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(255,179,0,0.2);
+    animation: scanline 0.1s infinite;
+}
+
+#random-joke-display .joke-setup    { font-size: 1.3rem; margin-bottom: 16px; }
+#random-joke-display .joke-punchline { font-size: 2rem; }
+
+@keyframes scanline {
+    0%   { background-position: 0 0; }
+    100% { background-position: 0 4px; }
+}
+
+/* ── Form Styles ────────────────────────────────────────── */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.55rem;
+    color: var(--amber);
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    background: #111;
+    border: 2px solid var(--amber);
+    color: var(--green);
+    font-family: 'VT323', monospace;
+    font-size: 1.3rem;
+    padding: 10px 14px;
+    outline: none;
+    resize: vertical;
+    letter-spacing: 1px;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 10px rgba(57,255,20,0.2);
+}
+
+/* ── Alert / Flash Messages ─────────────────────────────── */
+.alert {
+    font-family: 'VT323', monospace;
+    font-size: 1.3rem;
+    padding: 14px 20px;
+    margin-bottom: 20px;
+    border: 2px solid;
+    letter-spacing: 2px;
+}
+
+.alert-success { color: var(--green); border-color: var(--green); background: rgba(57,255,20,0.05); }
+.alert-error   { color: var(--red);   border-color: var(--red);   background: rgba(255,68,68,0.05); }
+
+/* ── Joke Count Badge ───────────────────────────────────── */
+.joke-count {
+    font-family: 'VT323', monospace;
+    font-size: 1rem;
+    color: #555;
+    text-align: right;
+    margin-bottom: 16px;
+    letter-spacing: 2px;
+}
+
+/* ── No Results ─────────────────────────────────────────── */
+.no-results {
+    font-family: 'VT323', monospace;
+    font-size: 1.5rem;
+    color: var(--red);
+    text-align: center;
+    padding: 40px;
+    letter-spacing: 2px;
+}
+
+/* ── Footer ─────────────────────────────────────────────── */
+footer {
+    text-align: center;
+    padding: 20px;
+    font-family: 'VT323', monospace;
+    font-size: 1rem;
+    color: #555;
+    letter-spacing: 2px;
+    border-top: 2px solid var(--wood);
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+footer a { color: var(--amber); text-decoration: none; }
+footer a:hover { color: var(--green); }
+
+/* ── Admin Table ────────────────────────────────────────── */
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'VT323', monospace;
+    font-size: 1.1rem;
+}
+
+.admin-table th {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.5rem;
+    color: var(--amber);
+    padding: 12px 10px;
+    border-bottom: 2px solid var(--wood);
+    text-align: left;
+    letter-spacing: 1px;
+}
+
+.admin-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #222;
+    color: var(--cream);
+    vertical-align: top;
+}
+
+.admin-table tr:hover td { background: rgba(255,179,0,0.03); }
+
+/* ── Responsive ─────────────────────────────────────────── */
+@media (max-width: 600px) {
+    .terminal-panel { padding: 20px 16px; }
+    .site-title     { font-size: 1.1rem; }
+    nav a           { font-size: 0.5rem; padding: 8px 12px; }
+    .btn            { font-size: 0.45rem; }
+}
