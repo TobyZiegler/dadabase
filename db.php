@@ -7,7 +7,7 @@
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'tobyjhmw_dadabase');
 define('DB_USER', 'tobyjhmw_dadabasedad');
-define('DB_PASS', 'YOUR_PASSWORD_HERE');
+define('DB_PASS', 'Daduser4dabase!');
 
 try {
     $pdo = new PDO(

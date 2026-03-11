@@ -6,7 +6,7 @@
 // ============================================================
 require_once 'db.php';
 
-define('ADMIN_PASSWORD', 'YOUR_ADMIN_PASSWORD_HERE');
+define('ADMIN_PASSWORD', 'Dadmin4dabase!');
 
 session_start();
 
