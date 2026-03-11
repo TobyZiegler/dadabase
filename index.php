@@ -39,7 +39,7 @@ $total = count($jokes);
 
 <header>
     <div class="site-title">DAD-A-BASE</div>
-    <div class="site-subtitle">&gt; THE ULTIMATE DAD JOKE DATABASE &lt;</div>
+    <div class="site-subtitle">&gt; Yet Another Dad Joke Database &lt;</div>
 </header>
 
 <nav>
