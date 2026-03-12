@@ -109,15 +109,26 @@ let heroJokeId = null;
 let searchTimer = null;
 let archiveLoaded = false;
 
-// ── Reveal archive ──────────────────────────────────────────────────
+// ── Reveal / toggle archive ─────────────────────────────────────────
 function revealArchive() {
-  document.getElementById('archive-prompt').style.display = 'none';
-  document.getElementById('jokes-grid').style.display = 'grid';
-  document.getElementById('browse').scrollIntoView({ behavior: 'smooth' });
+  var prompt = document.getElementById('archive-prompt');
+  var grid   = document.getElementById('jokes-grid');
+
   if (!archiveLoaded) {
-    loadJokes();
+    // First click — hide prompt, show grid, load jokes
+    prompt.style.display = 'none';
+    grid.style.display   = 'grid';
     archiveLoaded = true;
+    loadJokes();
+  } else if (grid.style.display === 'none') {
+    // Archive loaded but hidden — show it
+    grid.style.display = 'grid';
+  } else {
+    // Archive visible — hide it
+    grid.style.display = 'none';
   }
+
+  document.getElementById('browse').scrollIntoView({ behavior: 'smooth' });
 }
 
 // ── Fetch jokes from jokes.php ──────────────────────────────────────
