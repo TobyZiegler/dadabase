@@ -4,8 +4,8 @@
 // to a public repository with real credentials.
 
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'dadabase');
-define('DB_USER', 'dadabasedad');
+define('DB_NAME', 'tobyjhmw_dadabase');
+define('DB_USER', 'tobyjhmw_dadabasedad');
 define('DB_PASS', 'Daduser4dabase!');
 
 // ─── PDO Connection ──────────────────────────────────────────────────
