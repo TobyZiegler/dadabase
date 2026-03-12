@@ -244,32 +244,10 @@ function escHtml(str) {
   return d.innerHTML;
 }
 
-// ── AJAX handler (same file) ────────────────────────────────────────
-// Handled below in PHP — JS just fetches with headers
-
 // ── Init ────────────────────────────────────────────────────────────
 loadHeroJoke();
 loadJokes();
 </script>
 
-<?php
-// ── AJAX endpoints embedded in index.php ──────────────────────────
-if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') {
-    header('Content-Type: application/json');
-    $action = $_GET['action'] ?? '';
-
-    if ($action === 'all') {
-        $stmt = $pdo->query("SELECT * FROM jokes WHERE status = 'approved' ORDER BY created_at DESC");
-        echo json_encode($stmt->fetchAll());
-
-    } elseif ($action === 'search') {
-        $q = '%' . trim($_GET['q'] ?? '') . '%';
-        $stmt = $pdo->prepare("SELECT * FROM jokes WHERE status = 'approved' AND (setup LIKE ? OR punchline LIKE ?) ORDER BY created_at DESC");
-        $stmt->execute([$q, $q]);
-        echo json_encode($stmt->fetchAll());
-    }
-    exit;
-}
-?>
 </body>
 </html>
