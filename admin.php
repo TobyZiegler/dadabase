@@ -42,11 +42,12 @@ if ($authed && $_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
 
         } elseif ($action === 'edit') {
-            $setup     = trim($_POST['setup']     ?? '');
-            $punchline = trim($_POST['punchline'] ?? '');
+            $setup        = trim($_POST['setup']        ?? '');
+            $punchline    = trim($_POST['punchline']    ?? '');
+            $submitted_by = trim($_POST['submitted_by'] ?? '') ?: 'Anonymous';
             if ($setup && $punchline) {
-                $pdo->prepare("UPDATE jokes SET setup = ?, punchline = ? WHERE id = ?")
-                    ->execute([$setup, $punchline, $jokeId]);
+                $pdo->prepare("UPDATE jokes SET setup = ?, punchline = ?, submitted_by = ? WHERE id = ?")
+                    ->execute([$setup, $punchline, $submitted_by, $jokeId]);
             }
             header('Location: admin.php');
             exit;
@@ -186,6 +187,11 @@ if ($authed) {
       <div class="field">
         <label for="edit-punchline">Punchline</label>
         <textarea id="edit-punchline" name="punchline" style="min-height:72px"><?= htmlspecialchars($editJoke['punchline']) ?></textarea>
+      </div>
+
+      <div class="field">
+        <label for="edit-submitted-by">Submitted by</label>
+        <input type="text" id="edit-submitted-by" name="submitted_by" maxlength="100" value="<?= htmlspecialchars($editJoke['submitted_by'] ?: 'Anonymous') ?>">
       </div>
 
       <div class="modal-actions">
