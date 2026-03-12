@@ -121,11 +121,13 @@ function revealArchive() {
     archiveLoaded = true;
     loadJokes();
   } else if (grid.style.display === 'none') {
-    // Archive loaded but hidden — show it
-    grid.style.display = 'grid';
+    // Archive loaded but hidden — show grid, hide prompt
+    prompt.style.display = 'none';
+    grid.style.display   = 'grid';
   } else {
-    // Archive visible — hide it
-    grid.style.display = 'none';
+    // Archive visible — hide grid, restore prompt
+    grid.style.display   = 'none';
+    prompt.style.display = 'block';
   }
 
   document.getElementById('browse').scrollIntoView({ behavior: 'smooth' });
