@@ -32,7 +32,7 @@
       All in one place, curated with exactly as much care as they deserve.
     </p>
     <div class="hero-actions">
-      <a href="#browse" class="btn btn-primary">Browse All Jokes</a>
+      <button onclick="revealArchive()" class="btn btn-primary">Browse All Jokes</button>
       <a href="submit.php" class="btn btn-secondary">Submit Yours</a>
     </div>
   </div>
@@ -74,12 +74,18 @@
     >
   </div>
 
-  <div id="jokes-grid">
-    <div class="loading-state">
-      <div class="loading-spinner"></div>
-      <p>Fetching the good stuff…</p>
+  <!-- Hidden until Browse is clicked -->
+  <div id="archive-prompt" style="text-align:center;padding:48px 20px">
+    <div style="font-family:var(--font-display);font-size:1.3rem;font-weight:400;color:var(--brown);margin-bottom:16px">
+      Ready when you are.
     </div>
+    <p style="color:var(--taupe);font-size:0.95rem;margin-bottom:28px">
+      Browse the full archive or search above to find a specific joke.
+    </p>
+    <button onclick="revealArchive()" class="btn btn-primary">Browse All Jokes</button>
   </div>
+
+  <div id="jokes-grid" style="display:none"></div>
 </section>
 
 <!-- ─── Footer ─────────────────────────────────────────────────────── -->
@@ -100,6 +106,7 @@
 
 <!-- ─── JS ────────────────────────────────────────────────────────── -->
 <script>
+let allJokes = [];
 let heroJokeId = null;
 let searchTimer = null;
 
@@ -110,13 +117,14 @@ async function loadJokes(query = '') {
 
   try {
     const url = query
-      ? `jokes.php?action=search&q=${encodeURIComponent(query)}`
-      : 'jokes.php?action=all';
-    const res = await fetch(url);
+      ? `?action=search&q=${encodeURIComponent(query)}`
+      : '?action=all';
+    const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
     const jokes = await res.json();
+    allJokes = jokes;
     renderJokes(jokes);
   } catch (e) {
-    grid.innerHTML = '<div class="empty-state"><div class="empty-icon">😅</div><h3>Something went wrong</h3><p>Try refreshing.</p></div>';
+    grid.innerHTML = '<div class="empty-state"><div class="empty-icon">😅</div><h3>Something went wrong</h3><p>Couldn\'t load jokes. Try refreshing.</p></div>';
   }
 }
 
@@ -138,10 +146,10 @@ function renderJokes(jokes) {
       <div class="joke-punchline">${escHtml(j.punchline)}</div>
       <div class="joke-footer">
         <div class="vote-group">
-          <button class="vote-btn ha" onclick="vote(${j.id}, 'ha', this)">
+          <button class="vote-btn ha" onclick="vote(${j.id}, 'ha', this)" id="ha-${j.id}">
             😄 Ha! <span class="vote-count">${j.ha_count}</span>
           </button>
-          <button class="vote-btn groan" onclick="vote(${j.id}, 'groan', this)">
+          <button class="vote-btn groan" onclick="vote(${j.id}, 'groan', this)" id="groan-${j.id}">
             😩 Groan <span class="vote-count">${j.groan_count}</span>
           </button>
         </div>
@@ -174,8 +182,8 @@ async function loadHeroJoke() {
       <button class="vote-btn-sm groan" onclick="heroVote('groan')">😩 Groan</button>
     `;
   } catch (e) {
-    setupEl.textContent = 'Why can\'t a bicycle stand on its own?';
-    punchlineEl.textContent = 'Because it\'s two-tired.';
+    setupEl.textContent = 'Why can't a bicycle stand on its own?';
+    punchlineEl.textContent = 'Because it's two-tired.';
     punchlineEl.classList.add('revealed');
     revealBtn.style.display = 'none';
   }
@@ -222,6 +230,13 @@ async function vote(jokeId, voteType, btnEl) {
 
 // ── Search ──────────────────────────────────────────────────────────
 function handleSearch() {
+  // If someone searches before clicking Browse, reveal the archive
+  const prompt = document.getElementById('archive-prompt');
+  const grid   = document.getElementById('jokes-grid');
+  if (prompt.style.display !== 'none') {
+    prompt.style.display = 'none';
+    grid.style.display = 'grid';
+  }
   clearTimeout(searchTimer);
   searchTimer = setTimeout(() => {
     const q = document.getElementById('search-input').value.trim();
@@ -239,14 +254,22 @@ function showToast(msg) {
 
 // ── Escape HTML ─────────────────────────────────────────────────────
 function escHtml(str) {
-  const d = document.createElement('div');
-  d.appendChild(document.createTextNode(String(str)));
-  return d.innerHTML;
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 // ── Init ────────────────────────────────────────────────────────────
+function revealArchive() {
+  document.getElementById('archive-prompt').style.display = 'none';
+  document.getElementById('jokes-grid').style.display = 'grid';
+  document.getElementById('browse').scrollIntoView({ behavior: 'smooth' });
+  loadJokes();
+}
+
 loadHeroJoke();
-loadJokes();
 </script>
 
 </body>

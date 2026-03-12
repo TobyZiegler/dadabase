@@ -26,25 +26,49 @@ $authed = $_SESSION['admin_auth'] ?? false;
 
 // ─── Actions (must be authenticated) ────────────────────────────────
 if ($authed && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action  = $_POST['action']   ?? '';
+    $action  = $_POST['action'] ?? '';
     $jokeId  = filter_input(INPUT_POST, 'joke_id', FILTER_VALIDATE_INT);
 
     if ($jokeId) {
         if ($action === 'approve') {
             $pdo->prepare("UPDATE jokes SET status = 'approved' WHERE id = ?")->execute([$jokeId]);
+            header('Location: admin.php');
+            exit;
+
         } elseif ($action === 'delete') {
             $pdo->prepare("DELETE FROM votes WHERE joke_id = ?")->execute([$jokeId]);
             $pdo->prepare("DELETE FROM jokes WHERE id = ?")->execute([$jokeId]);
+            header('Location: admin.php');
+            exit;
+
+        } elseif ($action === 'edit') {
+            $setup     = trim($_POST['setup']     ?? '');
+            $punchline = trim($_POST['punchline'] ?? '');
+            if ($setup && $punchline) {
+                $pdo->prepare("UPDATE jokes SET setup = ?, punchline = ? WHERE id = ?")
+                    ->execute([$setup, $punchline, $jokeId]);
+            }
+            header('Location: admin.php');
+            exit;
         }
-        header('Location: admin.php');
-        exit;
+    }
+}
+
+// ─── Edit mode: load single joke ────────────────────────────────────
+$editJoke = null;
+if ($authed && isset($_GET['edit'])) {
+    $editId = filter_input(INPUT_GET, 'edit', FILTER_VALIDATE_INT);
+    if ($editId) {
+        $stmt = $pdo->prepare("SELECT * FROM jokes WHERE id = ?");
+        $stmt->execute([$editId]);
+        $editJoke = $stmt->fetch();
     }
 }
 
 // ─── Fetch data ──────────────────────────────────────────────────────
 if ($authed) {
-    $pending  = $pdo->query("SELECT * FROM jokes WHERE status = 'pending'  ORDER BY created_at ASC")->fetchAll();
-    $approved = $pdo->query("SELECT * FROM jokes WHERE status = 'approved' ORDER BY created_at DESC")->fetchAll();
+    $pending    = $pdo->query("SELECT * FROM jokes WHERE status = 'pending'  ORDER BY created_at ASC")->fetchAll();
+    $approved   = $pdo->query("SELECT * FROM jokes WHERE status = 'approved' ORDER BY created_at DESC")->fetchAll();
     $totalVotes = $pdo->query("SELECT COUNT(*) FROM votes")->fetchColumn();
 }
 ?>
@@ -55,6 +79,62 @@ if ($authed) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin — Dad-a-Base</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,8,4,0.6);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .modal-card {
+      background: var(--warm-white);
+      border-radius: var(--radius-lg);
+      padding: 40px;
+      max-width: 520px;
+      width: 100%;
+      box-shadow: var(--shadow-lg);
+    }
+    .modal-title {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 400;
+      color: var(--espresso);
+      margin-bottom: 6px;
+    }
+    .modal-subtitle {
+      font-size: 0.85rem;
+      color: var(--taupe);
+      margin-bottom: 28px;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 24px;
+    }
+    .btn-admin-edit {
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      font-weight: 500;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all var(--transition);
+      background: rgba(44,31,22,0.07);
+      color: var(--espresso);
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-admin-edit:hover {
+      background: var(--espresso);
+      color: white;
+    }
+  </style>
 </head>
 <body>
 
@@ -86,6 +166,37 @@ if ($authed) {
 </div>
 
 <?php else: ?>
+
+<!-- ─── Edit Modal ─────────────────────────────────────────────────── -->
+<?php if ($editJoke): ?>
+<div class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-title">Edit Joke #<?= $editJoke['id'] ?></div>
+    <div class="modal-subtitle">Changes save immediately and appear live on the site.</div>
+
+    <form method="POST">
+      <input type="hidden" name="action"  value="edit">
+      <input type="hidden" name="joke_id" value="<?= $editJoke['id'] ?>">
+
+      <div class="field">
+        <label for="edit-setup">Setup</label>
+        <textarea id="edit-setup" name="setup" style="min-height:80px"><?= htmlspecialchars($editJoke['setup']) ?></textarea>
+      </div>
+
+      <div class="field">
+        <label for="edit-punchline">Punchline</label>
+        <textarea id="edit-punchline" name="punchline" style="min-height:72px"><?= htmlspecialchars($editJoke['punchline']) ?></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button type="submit" class="btn btn-primary">Save Changes →</button>
+        <a href="admin.php" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+<?php endif ?>
+
 <!-- ─── Admin Dashboard ───────────────────────────────────────────── -->
 <div class="admin-page">
 
@@ -140,6 +251,7 @@ if ($authed) {
                   <input type="hidden" name="joke_id" value="<?= $j['id'] ?>">
                   <button type="submit" class="btn-admin-approve">✓ Approve</button>
                 </form>
+                <a href="?edit=<?= $j['id'] ?>" class="btn-admin-edit">✎ Edit</a>
                 <form method="POST" style="display:inline" onsubmit="return confirm('Delete this joke permanently?')">
                   <input type="hidden" name="action"  value="delete">
                   <input type="hidden" name="joke_id" value="<?= $j['id'] ?>">
@@ -187,6 +299,7 @@ if ($authed) {
             </td>
             <td>
               <div class="admin-action-group">
+                <a href="?edit=<?= $j['id'] ?>" class="btn-admin-edit">✎ Edit</a>
                 <form method="POST" style="display:inline" onsubmit="return confirm('Delete this joke and all its votes?')">
                   <input type="hidden" name="action"  value="delete">
                   <input type="hidden" name="joke_id" value="<?= $j['id'] ?>">

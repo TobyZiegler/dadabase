@@ -1,28 +1,37 @@
-# 🤣 Dad-a-Base
+# Dad-a-Base
 
-### *Yet Another Dad Joke Database*
+### *A Lovingly Curated Collection of Dad Jokes*
 
-> *"Why don't scientists trust atoms? Because they make up everything!"*
-> — The Dad-a-Base, probably
+> *"Why don't scientists trust atoms? Because they make up everything."*
+
+Live at **[dadabase.tobyziegler.com](https://dadabase.tobyziegler.com)**
 
 ---
 
 ## What Is This?
 
-The **Dad-a-Base** is a lovingly hand-crafted, retro-styled web application dedicated to the highest form of human comedy: the dad joke. Built as a showcase project for [TobyZiegler.com](https://tobyziegler.com), it is simultaneously a functional web app, a portfolio piece, and a tribute to every father who has ever cleared a room with a pun.
+The **Dad-a-Base** is a warm, contemporary web application dedicated to the highest form of human comedy: the dad joke. Built as a showcase project for [TobyZiegler.com](https://tobyziegler.com), it is simultaneously a functional web app, a portfolio piece, and a tribute to every father who has ever cleared a room with a pun.
 
-It lives at **[dadabase.tobyziegler.com](https://dadabase.tobyziegler.com)**.
+It is, in other words, the most dad thing imaginable: built with love, slightly embarrassing, and here whether you like it or not.
 
 ---
 
 ## Features
 
-- 📂 **Browse** a growing database of approved dad jokes
-- 🔍 **Search** the entire database by keyword — setup or punchline
-- 🎲 **Random Joke Generator** — one click, instant groan
-- ➕ **Submit Your Own** — visitor submissions go into a moderation queue
-- 😄 **Vote** on every joke with a *Ha!* or a *Groan*
-- 🔒 **Admin Panel** — password-protected moderation interface for approving and managing submissions
+- 🎲 **Joke of the Moment** — A random joke spotlighted on the homepage with a theatrical reveal mechanic
+- 📂 **Browse Archive** — The full joke database, revealed on demand
+- 🔍 **Live Search** — Instant keyword search across setups and punchlines; also triggers the archive if searched before browsing
+- ➕ **Submit a Joke** — Visitor submissions enter a moderation queue; success screen offers to submit another
+- 😄 **Vote** — Ha! or Groan on every joke; one vote per IP address per joke
+- 🔒 **Admin Panel** — Password-protected moderation interface for approving, editing, and deleting jokes
+
+---
+
+## Design Philosophy
+
+The Dad-a-Base uses a **warm editorial minimalism** aesthetic. The palette runs from cream and sand through espresso and terracotta — organic materials rather than interface colors. Typography pairs Fraunces (a characterful variable serif with beautiful italics) with DM Sans for body text. Space is generous, motion is restrained, and the single moment of theater — the punchline reveal — earns its drama because everything around it is calm.
+
+Accessibility was a priority throughout: contrast ratios are strong across the palette, mobile type sizes are scaled up generously for comfortable reading, and form inputs are sized to prevent iOS auto-zoom.
 
 ---
 
@@ -31,27 +40,14 @@ It lives at **[dadabase.tobyziegler.com](https://dadabase.tobyziegler.com)**.
 | Layer | Technology |
 |---|---|
 | Frontend | HTML5, CSS3, Vanilla JavaScript |
-| Backend | PHP 8 |
+| Backend | PHP 8.1 |
 | Database | MySQL 8 via PDO |
-| Hosting | Namecheap Shared Hosting |
-| Deployment | GitHub Actions → SSH/rsync |
+| Hosting | Namecheap Shared Hosting (cPanel) |
+| Deployment | Git Version Control via cPanel |
 | Version Control | Git / GitHub |
-| Design | Custom retro terminal aesthetic |
+| Fonts | Google Fonts (Fraunces, DM Sans) |
 
-No frameworks. No npm. No build step. Just files on a server, the way the web was built — and proud of it.
-
----
-
-## Design Philosophy
-
-The design philosophy could be called warm editorial minimalism.
-The core idea is that dad jokes are inherently humble and human — they belong to kitchens and road trips and Saturday mornings, not to neon-lit arcades or glowing terminals. So rather than leaning into a theatrical aesthetic the way the retro version did, this version treats the content with a kind of affectionate seriousness, the way a good food magazine takes simple ingredients seriously.
-A few principles that run through every decision:
-- The palette is organic rather than digital. Cream, espresso, sand, taupe — these are materials and substances, not interface colors. The one accent, a muted terracotta, adds warmth without excitement. It says "this was chosen with care" rather than "this was designed to grab you."
-- The typography does real work. Fraunces is a variable optical-size serif with genuine quirk — it has a slight oldstyle personality that feels literary without being stuffy. Using it at light weights for headlines creates contrast with the heavier card setups, and its italic cuts are genuinely beautiful. That's where the personality lives, in the italicized accent words like serious and full in the section headers.
-Space is the primary design element. The layout breathes. There's no visual clutter competing for attention, which means when a punchline lands, it lands cleanly. White space here isn't emptiness — it's the pause before the punchline.
-- The hero reveal mechanic is the one moment of genuine theater, and it earns it by being restrained everywhere else. Everything in the design is calm precisely so that clicking "reveal punchline" feels like a small, satisfying event.
-- Finally, there's a quiet self-awareness to it. The tagline in the footer — here whether you like it or not — is the only place the site winks at itself. That restraint is intentional. The original retro version wore its personality on every surface; this one saves it for one well-placed line.
+No frameworks. No npm. No build step. Just files on a server.
 
 ---
 
@@ -59,21 +55,20 @@ Space is the primary design element. The layout breathes. There's no visual clut
 
 ```
 dadabase.tobyziegler.com/
-├── index.php        # Main page — browse, search, random joke, voting
+├── index.php        # Homepage — hero joke, search, browse archive
+├── jokes.php        # JSON endpoint — all approved jokes or search results
 ├── submit.php       # Visitor joke submission form
 ├── vote.php         # AJAX voting endpoint (Ha! / Groan)
-├── random.php       # Random joke API endpoint (returns JSON)
+├── random.php       # Random joke JSON endpoint (used by hero)
 ├── admin.php        # Password-protected moderation panel
 ├── db.php           # Database connection (credentials not committed)
-├── style.css        # Retro terminal stylesheet
+├── style.css        # Full site stylesheet
 └── setup.sql        # Database schema + seed data (run once, never deployed)
 ```
 
 ---
 
 ## Database Schema
-
-Two tables power the whole thing:
 
 **`jokes`**
 | Column | Type | Notes |
@@ -92,11 +87,9 @@ Two tables power the whole thing:
 |---|---|---|
 | id | INT UNSIGNED | Primary key |
 | joke_id | INT UNSIGNED | Foreign key → jokes.id |
-| ip_address | VARCHAR(45) | Voter's IP (prevents duplicate votes) |
+| ip_address | VARCHAR(45) | Voter's IP (one vote per joke per IP) |
 | vote_type | ENUM | `ha` or `groan` |
 | voted_at | TIMESTAMP | Vote timestamp |
-
-A unique constraint on `(joke_id, ip_address)` ensures each visitor can only vote once per joke.
 
 ---
 
@@ -104,18 +97,19 @@ A unique constraint on `(joke_id, ip_address)` ensures each visitor can only vot
 
 ### First-Time Setup
 
-1. Create a MySQL database and user in cPanel
-2. Run `setup.sql` in phpMyAdmin to create tables and seed starter jokes
-3. Copy `db.php` to the server and fill in your credentials:
+1. In cPanel, create a subdomain pointed at a document root of `dadabase.tobyziegler.com`
+2. Create a MySQL database and user in cPanel's MySQL Databases tool. Note that Namecheap prepends your cPanel username to all database and user names — e.g. `username_dbname`
+3. Run `setup.sql` in phpMyAdmin to create tables and seed starter jokes
+4. Create `db.php` on the server (do not commit real credentials to GitHub):
 
 ```php
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'your_database_name');
-define('DB_USER', 'your_database_user');
-define('DB_PASS', 'your_password');
+define('DB_NAME', 'cpanelusername_yourdbname');
+define('DB_USER', 'cpanelusername_yourdbuser');
+define('DB_PASS', 'yourpassword');
 ```
 
-4. Set your admin password in `admin.php`:
+5. Set your admin password in `admin.php`:
 
 ```php
 define('ADMIN_PASSWORD', 'your_admin_password');
@@ -123,31 +117,35 @@ define('ADMIN_PASSWORD', 'your_admin_password');
 
 ### Ongoing Deployment
 
-This project uses **GitHub Actions** for continuous deployment. Every push to `main` automatically syncs files to the server via SSH/rsync.
+This project uses cPanel's **Git Version Control** tool. Push changes to GitHub, then pull them into the server using the "Update from Remote" button in the Pull or Deploy tab.
 
-Required GitHub Secrets:
+The following files are intentionally **excluded from deployment** via `.gitignore` and rsync rules:
+- `db.php` — contains live credentials, created manually on server
+- `setup.sql` — run once manually, never overwritten
+- `.github/` — workflow files
+- `.DS_Store` — macOS metadata
 
-| Secret | Value |
-|---|---|
-| `SSH_PRIVATE_KEY` | OpenSSH private key (authorized on server) |
-| `SSH_HOST` | Server hostname |
-| `SSH_USERNAME` | cPanel username |
+### Local Development
 
-The following files are intentionally **excluded** from deployment:
-- `setup.sql` — database schema, run once manually, never overwritten
-- `README.md` — documentation only
-- `.github/` — workflow files stay on GitHub
-- `.git*` — version control internals
-- `.DS_Store` — macOS junk
+PHP 8.1 is required. To run locally:
+
+```bash
+brew install php@8.1
+php -S localhost:8000
+```
+
+Visit `http://localhost:8000`. You'll see a database connection error without a local MySQL instance, which confirms PHP is executing correctly. The HTML, CSS, and JavaScript are all verifiable this way.
 
 ---
 
 ## Security Notes
 
-- `db.php` contains database credentials — never commit real credentials to a public repo. Use a local config or environment variables in production.
-- `admin.php` is protected by a plain password stored as a PHP constant. For a higher-security setup, consider moving to session-based authentication with hashed passwords.
-- Votes are tracked by IP address, which is a lightweight anti-spam measure. It is not foolproof — a determined person with a VPN can vote multiple times. For a joke database, this is an acceptable tradeoff.
+- `db.php` is never committed to the repository. Credentials live only on the server, created manually via cPanel File Manager or SFTP.
+- `admin.php` uses PHP sessions for authentication, with the password stored as a constant. For higher security, consider hashed passwords stored in the database.
+- Votes are limited to one per IP address per joke. This is a lightweight measure — a determined person with a VPN can circumvent it. For a joke database, this is an acceptable tradeoff.
 - All user input is sanitized via `htmlspecialchars()` on output and parameterized PDO queries on input, protecting against XSS and SQL injection.
+- JavaScript uses DOM-based HTML escaping (`createTextNode`) rather than string replacement, making it immune to character-based injection from joke content.
+- AJAX endpoints are separated into dedicated PHP files (`jokes.php`, `vote.php`, `random.php`) so joke content never touches the JavaScript layer directly.
 
 ---
 
@@ -155,43 +153,38 @@ The following files are intentionally **excluded** from deployment:
 
 The Dad-a-Base was built as the first showcase project for [TobyZiegler.com](https://tobyziegler.com) — a portfolio site for a graphic designer with 30+ years of experience who decided to learn AI-assisted software engineering.
 
-The entire application — from database schema to deployment pipeline — was built through a conversation with **Claude** (Anthropic), without writing a single line of code by hand. The project represents a new kind of engineering workflow: one where domain knowledge, project management instincts, and creative direction matter as much as syntax.
+The application was built through conversation with **Claude** (Anthropic) — from database schema through deployment pipeline and iterative refinement — without writing code by hand. The project represents a workflow where domain expertise, design sensibility, and project management instincts drive the process, with AI handling implementation.
 
-It is, in other words, the most dad thing imaginable: built with love, slightly embarrassing, and here whether you like it or not.
+The troubleshooting process was itself instructive: subdomain document root misconfiguration, the Namecheap cPanel username prefix convention for database names, and a JavaScript syntax error caused by PHP/JS mixing were the main obstacles, each diagnosed methodically through browser developer tools, terminal commands, and cPanel inspection.
 
 ---
 
 ## What's Next
 
-The Dad-a-Base is the first of several showcase projects planned for TobyZiegler.com. Future improvements to this project may include:
-
 - [ ] Pagination for large joke counts
-- [ ] Joke categories / tags
+- [ ] Joke categories and tags
 - [ ] Top-rated jokes leaderboard
 - [ ] Social sharing buttons
-- [ ] Daily joke email subscription
-- [ ] Joke of the Day feature on the homepage
+- [ ] Joke of the Day feature
+- [ ] Daily email subscription
 
 ---
 
 ## Contributing
 
-Found a dad joke so bad it's good? Hit the **Submit a Joke** button at [dadabase.tobyziegler.com/submit.php](https://dadabase.tobyziegler.com/submit.php). All submissions are reviewed before going live.
-
-Pull requests are welcome for bug fixes and improvements. For major changes, open an issue first.
+Hit the **Submit a Joke** button at [dadabase.tobyziegler.com/submit.php](https://dadabase.tobyziegler.com/submit.php). All submissions are reviewed before going live.
 
 ---
 
 ## License
 
-This project is open source and available under the [MIT License](LICENSE).
+MIT License
 
 ---
 
 ## Author
 
-**Toby Ziegler**
-[tobyziegler.com](https://tobyziegler.com)
+**Toby Ziegler** — [tobyziegler.com](https://tobyziegler.com)
 
 ---
 
