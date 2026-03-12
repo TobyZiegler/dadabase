@@ -95,6 +95,7 @@
   </div>
   <div class="footer-right">
     <a href="submit.php" class="footer-link">Submit a Joke</a>
+    <a href="about.php" class="footer-link">How This Was Built</a>
     <a href="admin.php" class="footer-link">Admin</a>
     <a href="https://tobyziegler.com" class="footer-link" target="_blank">TobyZiegler.com</a>
   </div>

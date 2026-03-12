@@ -127,5 +127,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </div>
 </main>
 
+<footer class="site-footer">
+  <div>
+    <div class="footer-brand">Dad-a-Base</div>
+    <div class="footer-tagline">Here whether you like it or not.</div>
+  </div>
+  <div class="footer-right">
+    <a href="index.php" class="footer-link">Browse Jokes</a>
+    <a href="about.php" class="footer-link">How This Was Built</a>
+    <a href="https://tobyziegler.com" class="footer-link" target="_blank">TobyZiegler.com</a>
+  </div>
+</footer>
+
 </body>
 </html>
