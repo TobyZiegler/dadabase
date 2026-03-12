@@ -59,7 +59,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ✓ &nbsp;Joke received! It'll appear in the archive once approved.
         Thanks for contributing to the greater groan.
       </div>
-      <a href="index.php" class="btn btn-primary" style="width:100%;justify-content:center;">← Back to the jokes</a>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <a href="submit.php" class="btn btn-primary" style="justify-content:center;">Submit Another Joke →</a>
+        <a href="index.php" class="btn btn-secondary" style="justify-content:center;">← Back to the jokes</a>
+      </div>
     <?php else: ?>
 
       <form method="POST" novalidate>
