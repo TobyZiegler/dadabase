@@ -3,8 +3,21 @@
 .AppleDouble
 .LSOverride
 
+# Credentials — never commit these
+db.php
+
+# Database schema — run manually, never auto-deploy
+# (Uncomment to keep setup.sql out of git entirely; or leave it tracked for docs)
+# setup.sql
+
+# Editor directories
+.idea/
+.vscode/
+*.swp
+
 # Icon must end with two \r
-Icon
+Icon
+
 
 # Thumbnails
 ._*

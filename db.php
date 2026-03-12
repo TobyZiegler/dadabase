@@ -1,14 +1,14 @@
 <?php
-// ============================================================
-//  Dad-a-Base — Database Connection
-//  Replace YOUR_PASSWORD_HERE with your actual database password
-// ============================================================
+// ─── Database Configuration ─────────────────────────────────────────
+// IMPORTANT: Fill in your actual credentials. Never commit this file
+// to a public repository with real credentials.
 
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'tobyjhmw_dadabase');
-define('DB_USER', 'tobyjhmw_dadabasedad');
-define('DB_PASS', 'Daduser4dabase!');
+define('DB_NAME', 'your_database_name');
+define('DB_USER', 'your_database_user');
+define('DB_PASS', 'your_password');
 
+// ─── PDO Connection ──────────────────────────────────────────────────
 try {
     $pdo = new PDO(
         'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4',
@@ -21,6 +21,6 @@ try {
         ]
     );
 } catch (PDOException $e) {
-    die('Database connection failed. Check your credentials in db.php.');
+    http_response_code(500);
+    die(json_encode(['error' => 'Database connection failed.']));
 }
-?>

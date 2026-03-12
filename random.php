@@ -1,18 +1,11 @@
 <?php
-// ============================================================
-//  Dad-a-Base — Random Joke API Endpoint
-//  Returns a single random approved joke as JSON
-// ============================================================
-header('Content-Type: application/json');
+// random.php — Returns a single random approved joke as JSON
 require_once 'db.php';
 
-$stmt = $pdo->query("
-    SELECT id, setup, punchline
-    FROM jokes
-    WHERE status = 'approved'
-    ORDER BY RAND()
-    LIMIT 1
-");
+header('Content-Type: application/json');
+header('Cache-Control: no-store');
+
+$stmt = $pdo->query("SELECT * FROM jokes WHERE status = 'approved' ORDER BY RAND() LIMIT 1");
 $joke = $stmt->fetch();
 
 if ($joke) {

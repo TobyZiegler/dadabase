@@ -1,123 +1,128 @@
 <?php
-// ============================================================
-//  Dad-a-Base — Submit a Joke
-// ============================================================
 require_once 'db.php';
 
-$message = '';
-$type    = '';
+$success = false;
+$errors  = [];
+$values  = ['setup' => '', 'punchline' => '', 'submitted_by' => ''];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $setup       = trim($_POST['setup']        ?? '');
-    $punchline   = trim($_POST['punchline']    ?? '');
-    $submitted_by = trim($_POST['submitted_by'] ?? 'Anonymous');
+    $setup        = trim($_POST['setup']        ?? '');
+    $punchline    = trim($_POST['punchline']    ?? '');
+    $submitted_by = trim($_POST['submitted_by'] ?? '') ?: 'Anonymous';
 
-    if ($setup === '' || $punchline === '') {
-        $message = '⚠ BOTH FIELDS ARE REQUIRED, PAL.';
-        $type    = 'error';
-    } elseif (strlen($setup) > 500 || strlen($punchline) > 500) {
-        $message = '⚠ KEEP IT UNDER 500 CHARACTERS. THIS IS A DAD JOKE, NOT A NOVEL.';
-        $type    = 'error';
-    } else {
-        $submitted_by = $submitted_by === '' ? 'Anonymous' : $submitted_by;
-        $submitted_by = substr($submitted_by, 0, 100);
+    if (strlen($setup) < 5)        $errors['setup']     = 'Please enter a setup (at least 5 characters).';
+    if (strlen($punchline) < 2)    $errors['punchline'] = 'Please enter a punchline.';
 
-        $stmt = $pdo->prepare("
-            INSERT INTO jokes (setup, punchline, submitted_by, status)
-            VALUES (:setup, :punchline, :submitted_by, 'pending')
-        ");
-        $stmt->execute([
-            ':setup'        => $setup,
-            ':punchline'    => $punchline,
-            ':submitted_by' => $submitted_by,
-        ]);
+    $values = compact('setup', 'punchline', 'submitted_by');
 
-        $message = '✅ JOKE RECEIVED! IT WILL APPEAR AFTER REVIEW. NICE WORK, DAD.';
-        $type    = 'success';
-        $setup = $punchline = $submitted_by = '';
+    if (empty($errors)) {
+        $stmt = $pdo->prepare("INSERT INTO jokes (setup, punchline, submitted_by, status) VALUES (?, ?, ?, 'pending')");
+        $stmt->execute([$setup, $punchline, $submitted_by]);
+        $success = true;
+        $values  = ['setup' => '', 'punchline' => '', 'submitted_by' => ''];
     }
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Submit a Joke — Dad-a-Base</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submit a Joke — Dad-a-Base</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="submit-page">
 
-<header>
-    <div class="site-title">DAD-A-BASE</div>
-    <div class="site-subtitle">&gt; SUBMIT YOUR FINEST MATERIAL &lt;</div>
+<!-- ─── Header ─────────────────────────────────────────────────────── -->
+<header class="site-header">
+  <a href="index.php" class="logo">
+    <span class="logo-text">Dad-a-Base</span>
+    <span class="logo-badge">Est. 2025</span>
+  </a>
+  <nav class="header-nav">
+    <a href="index.php" class="nav-link">← Browse jokes</a>
+  </nav>
 </header>
 
-<nav>
-    <a href="index.php">📂 Browse</a>
-    <a href="submit.php">➕ Submit a Joke</a>
-    <a href="https://tobyziegler.com" target="_blank">🏠 TobyZiegler.com</a>
-</nav>
+<main class="submit-main">
+  <div class="submit-card">
 
-<div class="terminal-panel">
-    <div class="section-title">📨 SUBMIT A DAD JOKE</div>
-
-    <?php if ($message): ?>
-        <div class="alert alert-<?= $type ?>"><?= htmlspecialchars($message) ?></div>
-    <?php endif; ?>
-
-    <p style="font-family:'VT323',monospace;font-size:1.1rem;color:#777;margin-bottom:24px;letter-spacing:1px;line-height:1.6;">
-        &gt; ALL SUBMISSIONS ARE REVIEWED BEFORE GOING LIVE.<br>
-        &gt; KEEP IT CLEAN. KEEP IT GROAN-WORTHY. KEEP IT DAD.
+    <div class="submit-eyebrow">Community Contribution</div>
+    <h1 class="submit-title">Got a good one?</h1>
+    <p class="submit-subtitle">
+      Submit your finest dad joke below. All submissions go through a brief
+      moderation review before going live. We take our puns seriously here.
     </p>
 
-    <form method="POST" action="submit.php">
+    <?php if ($success): ?>
+      <div class="alert alert-success">
+        ✓ &nbsp;Joke received! It'll appear in the archive once approved.
+        Thanks for contributing to the greater groan.
+      </div>
+      <a href="index.php" class="btn btn-primary" style="width:100%;justify-content:center;">← Back to the jokes</a>
+    <?php else: ?>
 
-        <div class="form-group">
-            <label for="setup">THE SETUP *</label>
-            <textarea
-                id="setup"
-                name="setup"
-                rows="3"
-                placeholder="Why don't scientists trust atoms?"
-                maxlength="500"
-            ><?= htmlspecialchars($setup ?? '') ?></textarea>
+      <form method="POST" novalidate>
+
+        <div class="field">
+          <label for="setup">The Setup</label>
+          <textarea
+            id="setup"
+            name="setup"
+            placeholder="Why don't scientists trust atoms?"
+            required
+          ><?= htmlspecialchars($values['setup']) ?></textarea>
+          <?php if (isset($errors['setup'])): ?>
+            <div class="error-msg" style="display:block"><?= htmlspecialchars($errors['setup']) ?></div>
+          <?php endif ?>
         </div>
 
-        <div class="form-group">
-            <label for="punchline">THE PUNCHLINE *</label>
-            <textarea
-                id="punchline"
-                name="punchline"
-                rows="3"
-                placeholder="Because they make up everything!"
-                maxlength="500"
-            ><?= htmlspecialchars($punchline ?? '') ?></textarea>
+        <div class="field">
+          <label for="punchline">The Punchline</label>
+          <textarea
+            id="punchline"
+            name="punchline"
+            placeholder="Because they make up everything!"
+            style="min-height:72px"
+            required
+          ><?= htmlspecialchars($values['punchline']) ?></textarea>
+          <?php if (isset($errors['punchline'])): ?>
+            <div class="error-msg" style="display:block"><?= htmlspecialchars($errors['punchline']) ?></div>
+          <?php endif ?>
         </div>
 
-        <div class="form-group">
-            <label for="submitted_by">YOUR NAME (OPTIONAL)</label>
-            <input
-                type="text"
-                id="submitted_by"
-                name="submitted_by"
-                placeholder="Anonymous Dad"
-                maxlength="100"
-                value="<?= htmlspecialchars($submitted_by ?? '') ?>"
-            >
+        <div class="field">
+          <label for="submitted_by">Your Name <span style="font-weight:300;text-transform:none;letter-spacing:0">(optional)</span></label>
+          <input
+            type="text"
+            id="submitted_by"
+            name="submitted_by"
+            placeholder="Anonymous"
+            maxlength="100"
+            value="<?= htmlspecialchars($values['submitted_by']) ?>"
+          >
+          <div class="field-hint">Leave blank to submit anonymously.</div>
         </div>
 
-        <button type="submit" class="btn btn-amber" style="width:100%;padding:16px;font-size:0.65rem;">
-            🚀 LAUNCH THIS JOKE INTO THE DAD-A-BASE
+        <?php if (!empty($errors)): ?>
+          <div class="alert alert-error">Please fix the errors above before submitting.</div>
+        <?php endif ?>
+
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:8px">
+          Submit Joke →
         </button>
 
-    </form>
-</div>
+      </form>
 
-<footer>
-    <p>DAD-A-BASE &copy; <?= date('Y') ?> &nbsp;|&nbsp; <a href="https://tobyziegler.com">TOBYZIEGLER.COM</a></p>
-    <p style="margin-top:6px;">POWERED BY BAD PUNS AND QUESTIONABLE LIFE CHOICES</p>
-</footer>
+      <p class="submit-footer-note">
+        All jokes are reviewed before going live. We'll reject anything mean-spirited
+        or not actually a dad joke. Low bar, but there is one.
+      </p>
+
+    <?php endif ?>
+
+  </div>
+</main>
 
 </body>
 </html>

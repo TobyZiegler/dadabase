@@ -1,21 +1,18 @@
 <?php
-// ============================================================
-//  Dad-a-Base — Admin Panel
-//  Password-protect this page! Change the password below.
-//  ⚠ IMPORTANT: Change ADMIN_PASSWORD before uploading!
-// ============================================================
+session_start();
 require_once 'db.php';
 
-define('ADMIN_PASSWORD', 'Dadmin4dabase!');
+// ─── Configuration ───────────────────────────────────────────────────
+define('ADMIN_PASSWORD', 'your_admin_password'); // ← Change this
 
-session_start();
+// ─── Authentication ──────────────────────────────────────────────────
+$loginError = false;
 
-// ── Login / Logout ───────────────────────────────────────
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['admin_password'])) {
-    if ($_POST['admin_password'] === ADMIN_PASSWORD) {
-        $_SESSION['dadabase_admin'] = true;
+if (isset($_POST['password'])) {
+    if ($_POST['password'] === ADMIN_PASSWORD) {
+        $_SESSION['admin_auth'] = true;
     } else {
-        $login_error = 'INCORRECT PASSWORD. TRY AGAIN.';
+        $loginError = true;
     }
 }
 
@@ -25,179 +22,189 @@ if (isset($_GET['logout'])) {
     exit;
 }
 
-$is_admin = $_SESSION['dadabase_admin'] ?? false;
+$authed = $_SESSION['admin_auth'] ?? false;
 
-// ── Admin Actions ────────────────────────────────────────
-$action_message = '';
-if ($is_admin && $_SERVER['REQUEST_METHOD'] === 'POST') {
+// ─── Actions (must be authenticated) ────────────────────────────────
+if ($authed && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $action  = $_POST['action']   ?? '';
+    $jokeId  = filter_input(INPUT_POST, 'joke_id', FILTER_VALIDATE_INT);
 
-    if (isset($_POST['approve'])) {
-        $id = (int) $_POST['approve'];
-        $pdo->prepare("UPDATE jokes SET status = 'approved' WHERE id = :id")
-            ->execute([':id' => $id]);
-        $action_message = '✅ JOKE APPROVED.';
-    }
-
-    if (isset($_POST['reject'])) {
-        $id = (int) $_POST['reject'];
-        $pdo->prepare("DELETE FROM jokes WHERE id = :id")
-            ->execute([':id' => $id]);
-        $action_message = '🗑 JOKE DELETED.';
-    }
-
-    if (isset($_POST['delete_approved'])) {
-        $id = (int) $_POST['delete_approved'];
-        $pdo->prepare("DELETE FROM jokes WHERE id = :id")
-            ->execute([':id' => $id]);
-        $action_message = '🗑 JOKE REMOVED FROM DATABASE.';
+    if ($jokeId) {
+        if ($action === 'approve') {
+            $pdo->prepare("UPDATE jokes SET status = 'approved' WHERE id = ?")->execute([$jokeId]);
+        } elseif ($action === 'delete') {
+            $pdo->prepare("DELETE FROM votes WHERE joke_id = ?")->execute([$jokeId]);
+            $pdo->prepare("DELETE FROM jokes WHERE id = ?")->execute([$jokeId]);
+        }
+        header('Location: admin.php');
+        exit;
     }
 }
 
-// ── Fetch Data ───────────────────────────────────────────
-if ($is_admin) {
-    $pending = $pdo->query("
-        SELECT * FROM jokes WHERE status = 'pending' ORDER BY created_at ASC
-    ")->fetchAll();
-
-    $approved = $pdo->query("
-        SELECT * FROM jokes WHERE status = 'approved' ORDER BY created_at DESC
-    ")->fetchAll();
+// ─── Fetch data ──────────────────────────────────────────────────────
+if ($authed) {
+    $pending  = $pdo->query("SELECT * FROM jokes WHERE status = 'pending'  ORDER BY created_at ASC")->fetchAll();
+    $approved = $pdo->query("SELECT * FROM jokes WHERE status = 'approved' ORDER BY created_at DESC")->fetchAll();
+    $totalVotes = $pdo->query("SELECT COUNT(*) FROM votes")->fetchColumn();
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin — Dad-a-Base</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Dad-a-Base</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<header>
-    <div class="site-title">DAD-A-BASE</div>
-    <div class="site-subtitle">&gt; ADMIN CONTROL PANEL &lt;</div>
-</header>
+<?php if (!$authed): ?>
+<!-- ─── Login ──────────────────────────────────────────────────────── -->
+<div class="login-wrap">
+  <div class="login-card">
+    <div class="login-logo">Dad-a-Base</div>
+    <div class="login-subtitle">Admin access only. Nothing to see here.</div>
 
-<nav>
-    <a href="index.php">📂 Browse</a>
-    <a href="submit.php">➕ Submit a Joke</a>
-    <?php if ($is_admin): ?>
-        <a href="admin.php?logout=1">🔒 LOGOUT</a>
-    <?php endif; ?>
-    <a href="https://tobyziegler.com" target="_blank">🏠 TobyZiegler.com</a>
-</nav>
+    <?php if ($loginError): ?>
+      <div class="alert alert-error" style="margin-bottom:20px">Incorrect password. Try again.</div>
+    <?php endif ?>
 
-<div class="terminal-panel">
-
-<?php if (!$is_admin): ?>
-    <!-- Login Form -->
-    <div class="section-title">🔐 ADMIN LOGIN</div>
-
-    <?php if (!empty($login_error)): ?>
-        <div class="alert alert-error"><?= htmlspecialchars($login_error) ?></div>
-    <?php endif; ?>
-
-    <form method="POST" action="admin.php" style="max-width:400px;margin:0 auto;">
-        <div class="form-group">
-            <label for="admin_password">PASSWORD</label>
-            <input type="password" id="admin_password" name="admin_password" placeholder="> ENTER PASSWORD">
-        </div>
-        <button type="submit" class="btn btn-amber" style="width:100%;padding:16px;">
-            🔓 ENTER THE DAD-A-BASE
-        </button>
+    <form method="POST">
+      <div class="field" style="text-align:left">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" autofocus placeholder="••••••••">
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:4px">
+        Sign In →
+      </button>
     </form>
 
-<?php else: ?>
-
-    <?php if ($action_message): ?>
-        <div class="alert alert-success"><?= htmlspecialchars($action_message) ?></div>
-    <?php endif; ?>
-
-    <!-- Pending Jokes -->
-    <div class="section-title">⏳ PENDING REVIEW (<?= count($pending) ?>)</div>
-
-    <?php if (empty($pending)): ?>
-        <p style="font-family:'VT323',monospace;color:#555;text-align:center;font-size:1.2rem;margin-bottom:30px;">
-            &gt; NO PENDING JOKES. ALL CLEAR.
-        </p>
-    <?php else: ?>
-        <table class="admin-table" style="margin-bottom:40px;">
-            <thead>
-                <tr>
-                    <th>SETUP</th>
-                    <th>PUNCHLINE</th>
-                    <th>FROM</th>
-                    <th>DATE</th>
-                    <th>ACTIONS</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($pending as $joke): ?>
-                <tr>
-                    <td><?= htmlspecialchars($joke['setup']) ?></td>
-                    <td><?= htmlspecialchars($joke['punchline']) ?></td>
-                    <td><?= htmlspecialchars($joke['submitted_by']) ?></td>
-                    <td><?= date('M j, Y', strtotime($joke['created_at'])) ?></td>
-                    <td>
-                        <form method="POST" action="admin.php" style="display:inline;">
-                            <input type="hidden" name="approve" value="<?= $joke['id'] ?>">
-                            <button type="submit" class="btn btn-green" style="font-size:0.45rem;padding:6px 10px;">✅ APPROVE</button>
-                        </form>
-                        <form method="POST" action="admin.php" style="display:inline;margin-left:6px;"
-                              onsubmit="return confirm('DELETE this joke?')">
-                            <input type="hidden" name="reject" value="<?= $joke['id'] ?>">
-                            <button type="submit" class="btn btn-red" style="font-size:0.45rem;padding:6px 10px;">🗑 DELETE</button>
-                        </form>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    <?php endif; ?>
-
-    <!-- Approved Jokes -->
-    <div class="section-title">✅ APPROVED JOKES (<?= count($approved) ?>)</div>
-
-    <table class="admin-table">
-        <thead>
-            <tr>
-                <th>SETUP</th>
-                <th>PUNCHLINE</th>
-                <th>😄 HA</th>
-                <th>😩 GROAN</th>
-                <th>DATE</th>
-                <th>REMOVE</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($approved as $joke): ?>
-            <tr>
-                <td><?= htmlspecialchars($joke['setup']) ?></td>
-                <td><?= htmlspecialchars($joke['punchline']) ?></td>
-                <td><?= $joke['ha_count'] ?></td>
-                <td><?= $joke['groan_count'] ?></td>
-                <td><?= date('M j, Y', strtotime($joke['created_at'])) ?></td>
-                <td>
-                    <form method="POST" action="admin.php"
-                          onsubmit="return confirm('Remove this joke from the database?')">
-                        <input type="hidden" name="delete_approved" value="<?= $joke['id'] ?>">
-                        <button type="submit" class="btn btn-red" style="font-size:0.45rem;padding:6px 10px;">🗑 REMOVE</button>
-                    </form>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-
-<?php endif; ?>
-
+    <div style="margin-top:24px">
+      <a href="index.php" style="font-size:0.82rem;color:var(--taupe);text-decoration:none">← Back to Dad-a-Base</a>
+    </div>
+  </div>
 </div>
 
-<footer>
-    <p>DAD-A-BASE &copy; <?= date('Y') ?> &nbsp;|&nbsp; <a href="https://tobyziegler.com">TOBYZIEGLER.COM</a></p>
-    <p style="margin-top:6px;">POWERED BY BAD PUNS AND QUESTIONABLE LIFE CHOICES</p>
-</footer>
+<?php else: ?>
+<!-- ─── Admin Dashboard ───────────────────────────────────────────── -->
+<div class="admin-page">
+
+  <header class="admin-header">
+    <div class="admin-title">Dad-a-Base Admin</div>
+    <nav class="admin-nav">
+      <span style="font-size:0.82rem;color:rgba(255,255,255,0.4)">
+        <?= count($approved) ?> approved &nbsp;·&nbsp;
+        <?= count($pending) ?> pending &nbsp;·&nbsp;
+        <?= $totalVotes ?> votes
+      </span>
+      <a href="index.php">View Site</a>
+      <a href="?logout=1">Sign Out</a>
+    </nav>
+  </header>
+
+  <main class="admin-main">
+
+    <!-- Pending Submissions -->
+    <h2 class="admin-section-title">
+      Pending Review
+      <?php if (count($pending) > 0): ?>
+        <span style="font-size:0.85rem;color:var(--accent);font-family:var(--font-body);font-weight:400;margin-left:12px"><?= count($pending) ?> awaiting</span>
+      <?php endif ?>
+    </h2>
+
+    <?php if (empty($pending)): ?>
+      <p style="color:var(--taupe);font-size:0.9rem;margin-bottom:48px">All clear — no pending submissions.</p>
+    <?php else: ?>
+    <div class="admin-table-wrap" style="margin-bottom:48px">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Setup</th>
+            <th>Punchline</th>
+            <th>Submitted by</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($pending as $j): ?>
+          <tr>
+            <td style="max-width:220px"><?= htmlspecialchars($j['setup']) ?></td>
+            <td style="max-width:220px;color:var(--brown);font-style:italic"><?= htmlspecialchars($j['punchline']) ?></td>
+            <td><?= htmlspecialchars($j['submitted_by'] ?: 'Anonymous') ?></td>
+            <td style="color:var(--taupe);white-space:nowrap;font-size:0.8rem"><?= date('M j, Y', strtotime($j['created_at'])) ?></td>
+            <td>
+              <div class="admin-action-group">
+                <form method="POST" style="display:inline">
+                  <input type="hidden" name="action"  value="approve">
+                  <input type="hidden" name="joke_id" value="<?= $j['id'] ?>">
+                  <button type="submit" class="btn-admin-approve">✓ Approve</button>
+                </form>
+                <form method="POST" style="display:inline" onsubmit="return confirm('Delete this joke permanently?')">
+                  <input type="hidden" name="action"  value="delete">
+                  <input type="hidden" name="joke_id" value="<?= $j['id'] ?>">
+                  <button type="submit" class="btn-admin-delete">✕ Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          <?php endforeach ?>
+        </tbody>
+      </table>
+    </div>
+    <?php endif ?>
+
+    <!-- Approved Jokes -->
+    <h2 class="admin-section-title">Approved Jokes</h2>
+
+    <?php if (empty($approved)): ?>
+      <p style="color:var(--taupe);font-size:0.9rem">No approved jokes yet. Approve some above!</p>
+    <?php else: ?>
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Setup</th>
+            <th>Punchline</th>
+            <th>By</th>
+            <th>Votes</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($approved as $j): ?>
+          <tr>
+            <td style="color:var(--taupe);font-size:0.8rem"><?= $j['id'] ?></td>
+            <td style="max-width:200px"><?= htmlspecialchars($j['setup']) ?></td>
+            <td style="max-width:200px;color:var(--brown);font-style:italic"><?= htmlspecialchars($j['punchline']) ?></td>
+            <td style="font-size:0.82rem;color:var(--taupe)"><?= htmlspecialchars($j['submitted_by'] ?: 'Anon') ?></td>
+            <td>
+              <div class="stats-row">
+                <span class="stat-pill stat-ha">😄 <?= $j['ha_count'] ?></span>
+                <span class="stat-pill stat-groan">😩 <?= $j['groan_count'] ?></span>
+              </div>
+            </td>
+            <td>
+              <div class="admin-action-group">
+                <form method="POST" style="display:inline" onsubmit="return confirm('Delete this joke and all its votes?')">
+                  <input type="hidden" name="action"  value="delete">
+                  <input type="hidden" name="joke_id" value="<?= $j['id'] ?>">
+                  <button type="submit" class="btn-admin-delete">✕ Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          <?php endforeach ?>
+        </tbody>
+      </table>
+    </div>
+    <?php endif ?>
+
+  </main>
+</div>
+
+<?php endif ?>
 
 </body>
 </html>

@@ -1,50 +1,32 @@
-# ============================================================
-#  Dad-a-Base — Automatic Deployment Workflow
-#  Triggers on every push to the main branch.
-#  Deploys all files to dadabase.tobyziegler.com via SSH/SFTP.
-# ============================================================
-
 name: Deploy to Namecheap
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   deploy:
-    name: Upload via SSH
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Check out the latest code from GitHub
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Install the SSH private key
-      - name: Set up SSH key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key:             ${{ secrets.SSH_PRIVATE_KEY }}
-          known_hosts:     unnecessary
-          if_key_exists:   replace
-
-      # Step 3: Configure SSH to skip host verification
-      - name: Configure SSH
+      - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "StrictHostKeyChecking no" >> ~/.ssh/config
-          echo "UserKnownHostsFile /dev/null" >> ~/.ssh/config
-          chmod 600 ~/.ssh/config
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
-      # Step 4: Deploy files via rsync over SSH
       - name: Deploy via rsync
         run: |
           rsync -avz --delete \
-            -e "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
             --exclude='.git*' \
-            --exclude='.github/' \
-            --exclude='setup.sql' \
-            --exclude='README.md' \
             --exclude='.DS_Store' \
-            ./ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/home/tobyjhmw/dadabase.tobyziegler.com/
+            --exclude='README.md' \
+            --exclude='setup.sql' \
+            --exclude='.github/' \
+            --exclude='db.php' \
+            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
+            ./ ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:public_html/dadabase.tobyziegler.com/

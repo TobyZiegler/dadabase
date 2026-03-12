@@ -44,15 +44,14 @@ No frameworks. No npm. No build step. Just files on a server, the way the web wa
 
 ## Design Philosophy
 
-The Dad-a-Base leans hard into a **1970s wood-paneled basement meets old-school computer terminal** aesthetic. Think:
-
-- Amber phosphor glow on a black screen
-- Pixel fonts that belonged on an Atari
-- Wood grain textures and chunky borders
-- Buttons that feel like they *click*
-- A groan-worthy personality baked into every line of copy
-
-The visual identity was intentional: dad jokes are a retro art form. The interface should feel like it was discovered in a basement, right next to the fondue set.
+The design philosophy could be called warm editorial minimalism.
+The core idea is that dad jokes are inherently humble and human — they belong to kitchens and road trips and Saturday mornings, not to neon-lit arcades or glowing terminals. So rather than leaning into a theatrical aesthetic the way the retro version did, this version treats the content with a kind of affectionate seriousness, the way a good food magazine takes simple ingredients seriously.
+A few principles that run through every decision:
+- The palette is organic rather than digital. Cream, espresso, sand, taupe — these are materials and substances, not interface colors. The one accent, a muted terracotta, adds warmth without excitement. It says "this was chosen with care" rather than "this was designed to grab you."
+- The typography does real work. Fraunces is a variable optical-size serif with genuine quirk — it has a slight oldstyle personality that feels literary without being stuffy. Using it at light weights for headlines creates contrast with the heavier card setups, and its italic cuts are genuinely beautiful. That's where the personality lives, in the italicized accent words like serious and full in the section headers.
+Space is the primary design element. The layout breathes. There's no visual clutter competing for attention, which means when a punchline lands, it lands cleanly. White space here isn't emptiness — it's the pause before the punchline.
+- The hero reveal mechanic is the one moment of genuine theater, and it earns it by being restrained everywhere else. Everything in the design is calm precisely so that clicking "reveal punchline" feels like a small, satisfying event.
+- Finally, there's a quiet self-awareness to it. The tagline in the footer — here whether you like it or not — is the only place the site winks at itself. That restraint is intentional. The original retro version wore its personality on every surface; this one saves it for one well-placed line.
 
 ---
 
