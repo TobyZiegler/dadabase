@@ -100,7 +100,6 @@
 
 <!-- ─── JS ────────────────────────────────────────────────────────── -->
 <script>
-let allJokes = [];
 let heroJokeId = null;
 let searchTimer = null;
 
@@ -111,14 +110,13 @@ async function loadJokes(query = '') {
 
   try {
     const url = query
-      ? `?action=search&q=${encodeURIComponent(query)}`
-      : '?action=all';
-    const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+      ? `jokes.php?action=search&q=${encodeURIComponent(query)}`
+      : 'jokes.php?action=all';
+    const res = await fetch(url);
     const jokes = await res.json();
-    allJokes = jokes;
     renderJokes(jokes);
   } catch (e) {
-    grid.innerHTML = '<div class="empty-state"><div class="empty-icon">😅</div><h3>Something went wrong</h3><p>Couldn\'t load jokes. Try refreshing.</p></div>';
+    grid.innerHTML = '<div class="empty-state"><div class="empty-icon">😅</div><h3>Something went wrong</h3><p>Try refreshing.</p></div>';
   }
 }
 
@@ -140,10 +138,10 @@ function renderJokes(jokes) {
       <div class="joke-punchline">${escHtml(j.punchline)}</div>
       <div class="joke-footer">
         <div class="vote-group">
-          <button class="vote-btn ha" onclick="vote(${j.id}, 'ha', this)" id="ha-${j.id}">
+          <button class="vote-btn ha" onclick="vote(${j.id}, 'ha', this)">
             😄 Ha! <span class="vote-count">${j.ha_count}</span>
           </button>
-          <button class="vote-btn groan" onclick="vote(${j.id}, 'groan', this)" id="groan-${j.id}">
+          <button class="vote-btn groan" onclick="vote(${j.id}, 'groan', this)">
             😩 Groan <span class="vote-count">${j.groan_count}</span>
           </button>
         </div>
@@ -176,8 +174,8 @@ async function loadHeroJoke() {
       <button class="vote-btn-sm groan" onclick="heroVote('groan')">😩 Groan</button>
     `;
   } catch (e) {
-    setupEl.textContent = 'Why can't a bicycle stand on its own?';
-    punchlineEl.textContent = 'Because it's two-tired.';
+    setupEl.textContent = 'Why can\'t a bicycle stand on its own?';
+    punchlineEl.textContent = 'Because it\'s two-tired.';
     punchlineEl.classList.add('revealed');
     revealBtn.style.display = 'none';
   }
@@ -241,11 +239,9 @@ function showToast(msg) {
 
 // ── Escape HTML ─────────────────────────────────────────────────────
 function escHtml(str) {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+  const d = document.createElement('div');
+  d.appendChild(document.createTextNode(String(str)));
+  return d.innerHTML;
 }
 
 // ── AJAX handler (same file) ────────────────────────────────────────
