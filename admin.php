@@ -3,7 +3,7 @@ session_start();
 require_once 'db.php';
 
 // ─── Configuration ───────────────────────────────────────────────────
-define('ADMIN_PASSWORD', 'your_admin_password'); // ← Change this
+define('ADMIN_PASSWORD', 'yourDadmin4dabase!'); // ← Change this
 
 // ─── Authentication ──────────────────────────────────────────────────
 $loginError = false;
