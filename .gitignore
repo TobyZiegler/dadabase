@@ -8,7 +8,12 @@ db.php
 
 # Database schema — run manually, never auto-deploy
 # (Uncomment to keep setup.sql out of git entirely; or leave it tracked for docs)
-# setup.sql
+setup.sql
+setup_admin.php
+bulk_upload.php
+bulk_download.php
+categorize.php
+
 
 # Editor directories
 .idea/
