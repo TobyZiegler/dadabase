@@ -16,7 +16,7 @@
     <span class="logo-badge">Est. 2025</span>
   </a>
   <nav class="header-nav">
-    <button onclick="revealArchive()" class="nav-link" style="background:none;border:none;cursor:pointer;font-size:inherit;">Browse</button>
+    <button onclick="revealArchive()" class="nav-link" style="background:none;border:none;cursor:pointer;font-size:inherit;">Show Them All</button>
     <a href="submit.php" class="btn-nav">Submit a Joke →</a>
   </nav>
 </header>
@@ -31,7 +31,7 @@
       All in one place, curated with exactly as much care as they deserve.
     </p>
     <div class="hero-actions">
-      <button onclick="revealArchive()" class="btn btn-primary">Browse All Jokes</button>
+      <button onclick="revealArchive()" class="btn btn-primary">Show all the jokes</button>
       <a href="submit.php" class="btn btn-secondary">Submit Yours</a>
     </div>
   </div>
@@ -73,6 +73,9 @@
     >
   </div>
 
+  <!-- Category filter pills — populated dynamically -->
+  <div id="category-filter-bar" style="display:none;flex-wrap:wrap;gap:8px;margin-bottom:28px"></div>
+
   <!-- Hidden until Browse is clicked or search is used -->
   <div id="archive-prompt" style="text-align:center;padding:48px 20px">
     <div style="font-family:var(--font-display);font-size:1.3rem;font-weight:400;color:var(--brown);margin-bottom:16px">
@@ -81,7 +84,7 @@
     <p style="color:var(--taupe);font-size:0.95rem;margin-bottom:28px">
       Browse the full archive or search above to find a specific joke.
     </p>
-    <button onclick="revealArchive()" class="btn btn-primary">Browse All Jokes</button>
+    <button onclick="revealArchive()" class="btn btn-primary">Show all the jokes</button>
   </div>
 
   <div id="jokes-grid" style="display:none"></div>
@@ -106,46 +109,85 @@
 
 <!-- ─── JS ────────────────────────────────────────────────────────── -->
 <script>
-let heroJokeId = null;
-let searchTimer = null;
+let heroJokeId    = null;
+let searchTimer   = null;
 let archiveLoaded = false;
+let activeCategory = ''; // '' = All
 
 // ── Reveal / toggle archive ─────────────────────────────────────────
 function revealArchive() {
   var prompt = document.getElementById('archive-prompt');
   var grid   = document.getElementById('jokes-grid');
+  var catBar = document.getElementById('category-filter-bar');
 
   if (!archiveLoaded) {
-    // First click — hide prompt, show grid, load jokes
     prompt.style.display = 'none';
     grid.style.display   = 'grid';
+    catBar.style.display = 'flex';
     archiveLoaded = true;
+    loadCategories();
     loadJokes();
   } else if (grid.style.display === 'none') {
-    // Archive loaded but hidden — show grid, hide prompt
     prompt.style.display = 'none';
     grid.style.display   = 'grid';
+    catBar.style.display = 'flex';
   } else {
-    // Archive visible — hide grid, restore prompt
     grid.style.display   = 'none';
+    catBar.style.display = 'none';
     prompt.style.display = 'block';
   }
 
   document.getElementById('browse').scrollIntoView({ behavior: 'smooth' });
 }
 
+// ── Load category pills ─────────────────────────────────────────────
+async function loadCategories() {
+  try {
+    var res  = await fetch('jokes.php?action=categories');
+    var cats = await res.json();
+    renderCategoryPills(cats);
+  } catch (e) { /* silently skip if endpoint not ready */ }
+}
+
+function renderCategoryPills(cats) {
+  var bar = document.getElementById('category-filter-bar');
+  if (!cats || cats.length === 0) { bar.style.display = 'none'; return; }
+
+  var pills = '<button class="cat-pill' + (activeCategory === '' ? ' active' : '') + '" onclick="filterByCategory(\'\')">All</button>';
+  cats.forEach(function(c) {
+    pills += '<button class="cat-pill' + (activeCategory === c ? ' active' : '') + '" onclick="filterByCategory(' + JSON.stringify(c) + ')">' + escHtml(c) + '</button>';
+  });
+  bar.innerHTML = pills;
+}
+
+function filterByCategory(cat) {
+  activeCategory = cat;
+  // Re-render pills to update active state
+  fetch('jokes.php?action=categories')
+    .then(function(r) { return r.json(); })
+    .then(renderCategoryPills)
+    .catch(function() {});
+  loadJokes(document.getElementById('search-input').value.trim());
+}
+
 // ── Fetch jokes from jokes.php ──────────────────────────────────────
 async function loadJokes(query) {
-  const grid = document.getElementById('jokes-grid');
+  var grid = document.getElementById('jokes-grid');
   grid.innerHTML = '<div class="loading-state"><div class="loading-spinner"></div><p>Fetching jokes\u2026</p></div>';
 
-  const url = (query && query.length > 0)
-    ? 'jokes.php?action=search&q=' + encodeURIComponent(query)
-    : 'jokes.php?action=all';
+  var url;
+  if (query && query.length > 0) {
+    url = 'jokes.php?action=search&q=' + encodeURIComponent(query);
+    if (activeCategory) url += '&category=' + encodeURIComponent(activeCategory);
+  } else if (activeCategory) {
+    url = 'jokes.php?action=by_category&category=' + encodeURIComponent(activeCategory);
+  } else {
+    url = 'jokes.php?action=all';
+  }
 
   try {
-    const res  = await fetch(url);
-    const jokes = await res.json();
+    var res   = await fetch(url);
+    var jokes = await res.json();
     renderJokes(jokes);
   } catch (e) {
     grid.innerHTML = '<div class="empty-state"><div class="empty-icon">\uD83D\uDE05</div><h3>Something went wrong</h3><p>Try refreshing the page.</p></div>';
@@ -154,19 +196,22 @@ async function loadJokes(query) {
 
 // ── Render joke cards ───────────────────────────────────────────────
 function renderJokes(jokes) {
-  const grid  = document.getElementById('jokes-grid');
-  const count = document.getElementById('joke-count');
+  var grid  = document.getElementById('jokes-grid');
+  var count = document.getElementById('joke-count');
   count.textContent = jokes.length === 1 ? '1 joke' : jokes.length + ' jokes';
 
   if (jokes.length === 0) {
-    grid.innerHTML = '<div class="empty-state"><div class="empty-icon">\uD83E\uDD14</div><h3>No jokes found</h3><p>Try a different search term.</p></div>';
+    grid.innerHTML = '<div class="empty-state"><div class="empty-icon">\uD83E\uDD14</div><h3>No jokes found</h3><p>Try a different search term or category.</p></div>';
     return;
   }
 
   grid.innerHTML = jokes.map(function(j, i) {
+    var catBadge = j.category
+      ? '<span class="joke-cat-badge">' + escHtml(j.category) + '</span>'
+      : '';
     return '<article class="joke-card" style="animation-delay:' + Math.min(i * 0.05, 0.5) + 's">'
-      + '<div class="joke-card-number">No. ' + String(j.id).padStart(3, '0') + '</div>'
-      + '<div class="joke-setup">'   + escHtml(j.setup)      + '</div>'
+      + '<div class="joke-card-number">No. ' + String(j.id).padStart(3, '0') + catBadge + '</div>'
+      + '<div class="joke-setup">'     + escHtml(j.setup)     + '</div>'
       + '<div class="joke-punchline">' + escHtml(j.punchline) + '</div>'
       + '<div class="joke-footer">'
         + '<div class="vote-group">'
@@ -181,10 +226,10 @@ function renderJokes(jokes) {
 
 // ── Hero random joke ────────────────────────────────────────────────
 async function loadHeroJoke() {
-  var setupEl    = document.getElementById('hero-setup');
+  var setupEl     = document.getElementById('hero-setup');
   var punchlineEl = document.getElementById('hero-punchline');
-  var revealBtn  = document.getElementById('reveal-btn');
-  var voteGroup  = document.getElementById('hero-vote-group');
+  var revealBtn   = document.getElementById('reveal-btn');
+  var voteGroup   = document.getElementById('hero-vote-group');
 
   setupEl.textContent = 'Loading\u2026';
   punchlineEl.classList.remove('revealed');
@@ -197,7 +242,7 @@ async function loadHeroJoke() {
     var joke = await res.json();
     if (joke.error) { throw new Error(joke.error); }
     heroJokeId = joke.id;
-    setupEl.textContent    = joke.setup;
+    setupEl.textContent     = joke.setup;
     punchlineEl.textContent = joke.punchline;
     voteGroup.innerHTML =
       '<button class="vote-btn-sm ha"    onclick="heroVote(\'ha\')">\uD83D\uDE04 Ha!</button>'
@@ -252,10 +297,13 @@ async function vote(jokeId, voteType, btnEl) {
 function handleSearch() {
   var prompt = document.getElementById('archive-prompt');
   var grid   = document.getElementById('jokes-grid');
+  var catBar = document.getElementById('category-filter-bar');
   if (prompt.style.display !== 'none') {
     prompt.style.display = 'none';
     grid.style.display   = 'grid';
+    catBar.style.display = 'flex';
     archiveLoaded = true;
+    loadCategories();
   }
   clearTimeout(searchTimer);
   searchTimer = setTimeout(function() {

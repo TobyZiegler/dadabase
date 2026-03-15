@@ -1,12 +1,25 @@
 <?php
 // ─── Database Configuration ─────────────────────────────────────────
-// IMPORTANT: Fill in your actual credentials. Never commit this file
-// to a public repository with real credentials.
+// IMPORTANT: This file contains ALL application secrets.
+// It must NEVER be committed to a public repository.
+//
+// .gitignore entries required for this project:
+//   db.php
+//   setup.sql
+//   setup_admin.php       ← one-time admin account creator; delete after running
+//   bulk_upload.php       ← admin tool; exclude if you prefer it server-only
+//   bulk_download.php     ← admin tool; exclude if you prefer it server-only
+//   categorize.php        ← contains API key via db.php; exclude from version control
 
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'tobyjhmw_dadabase');
 define('DB_USER', 'tobyjhmw_dadabasedad');
 define('DB_PASS', 'Daduser4dabase!');
+
+// ─── Anthropic API Key ───────────────────────────────────────────────
+// Used by categorize.php for AI-powered joke category assignment.
+// Get your key at: https://console.anthropic.com/
+define('ANTHROPIC_API_KEY', 'YOUR_ANTHROPIC_API_KEY_HERE');
 
 // ─── PDO Connection ──────────────────────────────────────────────────
 try {

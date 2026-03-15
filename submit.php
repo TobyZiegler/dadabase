@@ -60,9 +60,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         Thanks for contributing to the greater groan.
       </div>
       <div style="display:flex;flex-direction:column;gap:12px">
-        <a href="submit.php" class="btn btn-primary" style="justify-content:center;">Submit Another Joke →</a>
+        <a href="submit.php" id="submit-another-btn" class="btn btn-primary" style="justify-content:center;">Submit Another Joke →</a>
         <a href="index.php" class="btn btn-secondary" style="justify-content:center;">← Back to the jokes</a>
       </div>
+      <script>
+        // Auto-focus the Submit Another button so keyboard users and
+        // quick clickers can immediately proceed
+        document.addEventListener('DOMContentLoaded', function() {
+          var btn = document.getElementById('submit-another-btn');
+          if (btn) { btn.focus(); }
+        });
+      </script>
     <?php else: ?>
 
       <form method="POST" novalidate>
@@ -74,6 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             name="setup"
             placeholder="Why don't scientists trust atoms?"
             required
+            autofocus
           ><?= htmlspecialchars($values['setup']) ?></textarea>
           <?php if (isset($errors['setup'])): ?>
             <div class="error-msg" style="display:block"><?= htmlspecialchars($errors['setup']) ?></div>

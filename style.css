@@ -1238,3 +1238,60 @@ body::before {
     padding: 14px 24px;
   }
 }
+
+/* ─── Category Filter Pills ──────────────────────────────────────────── */
+#category-filter-bar {
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.cat-pill {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 7px 18px;
+  border-radius: var(--radius-xl);
+  border: 1.5px solid var(--sand);
+  background: var(--warm-white);
+  color: var(--brown);
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+
+.cat-pill:hover {
+  border-color: var(--espresso);
+  background: var(--espresso);
+  color: var(--warm-white);
+}
+
+.cat-pill.active {
+  background: var(--espresso);
+  border-color: var(--espresso);
+  color: var(--warm-white);
+}
+
+/* ─── Joke Card Category Badge ───────────────────────────────────────── */
+.joke-cat-badge {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-2);
+  background: rgba(30, 77, 68, 0.09);
+  padding: 2px 9px;
+  border-radius: 10px;
+  margin-left: 8px;
+  vertical-align: middle;
+  position: relative;
+  top: -1px;
+}
+
+/* ─── Focus ring for keyboard nav (Submit Another button) ────────────── */
+.btn-primary:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
