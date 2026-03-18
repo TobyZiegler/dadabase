@@ -162,7 +162,6 @@ function renderCategoryPills(cats) {
 
 function filterByCategory(cat) {
   activeCategory = cat;
-  // Re-render pills to update active state
   fetch('jokes.php?action=categories')
     .then(function(r) { return r.json(); })
     .then(renderCategoryPills)
@@ -206,11 +205,14 @@ function renderJokes(jokes) {
   }
 
   grid.innerHTML = jokes.map(function(j, i) {
-    var catBadge = j.category
-      ? '<span class="joke-cat-badge">' + escHtml(j.category) + '</span>'
-      : '';
+    // categories is an array supplied by jokes.php (decoded from JSON column)
+    var cats = Array.isArray(j.categories) ? j.categories : [];
+    var catBadges = cats.map(function(c) {
+      return '<span class="joke-cat-badge">' + escHtml(c) + '</span>';
+    }).join('');
+
     return '<article class="joke-card" style="animation-delay:' + Math.min(i * 0.05, 0.5) + 's">'
-      + '<div class="joke-card-number">No. ' + String(j.id).padStart(3, '0') + catBadge + '</div>'
+      + '<div class="joke-card-number">No. ' + String(j.id).padStart(3, '0') + catBadges + '</div>'
       + '<div class="joke-setup">'     + escHtml(j.setup)     + '</div>'
       + '<div class="joke-punchline">' + escHtml(j.punchline) + '</div>'
       + '<div class="joke-footer">'

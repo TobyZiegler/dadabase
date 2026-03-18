@@ -2,6 +2,23 @@
 session_start();
 require_once 'db.php';
 
+// ─── Helper: decode category column to display string ────────────────
+// Used in PHP rendering — returns a comma-joined string or empty string.
+function displayCategories($raw): string {
+    if ($raw === null || $raw === '') return '';
+    $decoded = json_decode($raw, true);
+    if (is_array($decoded)) return implode(', ', $decoded);
+    return trim($raw); // legacy plain string
+}
+
+// ─── Helper: decode category column to array ─────────────────────────
+function parseCategories($raw): array {
+    if ($raw === null || $raw === '') return [];
+    $decoded = json_decode($raw, true);
+    if (is_array($decoded)) return $decoded;
+    return [trim($raw)];
+}
+
 // ─── Authentication ──────────────────────────────────────────────────
 $loginError = false;
 
@@ -13,7 +30,6 @@ if (isset($_POST['password'])) {
     $admin = $row->fetch();
     if ($admin && password_verify($inputPass, $admin['password'])) {
         $_SESSION['admin_auth'] = true;
-        // Upgrade hash if bcrypt cost has changed
         if (password_needs_rehash($admin['password'], PASSWORD_BCRYPT, ['cost' => 12])) {
             $newHash = password_hash($inputPass, PASSWORD_BCRYPT, ['cost' => 12]);
             $pdo->prepare("UPDATE admins SET password = ? WHERE username = ?")
@@ -53,10 +69,19 @@ if ($authed && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $setup        = trim($_POST['setup']        ?? '');
             $punchline    = trim($_POST['punchline']    ?? '');
             $submitted_by = trim($_POST['submitted_by'] ?? '') ?: 'Anonymous';
-            $category     = trim($_POST['category']     ?? '') ?: null;
+
+            // Category field: comma-separated string from the text input.
+            // Normalize to a JSON array, or NULL if blank.
+            $catRaw  = trim($_POST['category'] ?? '');
+            $catVal  = null;
+            if ($catRaw !== '') {
+                $parts  = array_values(array_filter(array_map('trim', explode(',', $catRaw))));
+                $catVal = !empty($parts) ? json_encode($parts) : null;
+            }
+
             if ($setup && $punchline) {
                 $pdo->prepare("UPDATE jokes SET setup = ?, punchline = ?, submitted_by = ?, category = ? WHERE id = ?")
-                    ->execute([$setup, $punchline, $submitted_by, $category, $jokeId]);
+                    ->execute([$setup, $punchline, $submitted_by, $catVal, $jokeId]);
             }
             header('Location: admin.php');
             exit;
@@ -164,6 +189,17 @@ if ($authed) {
       opacity: 0.5;
       cursor: not-allowed;
     }
+    /* Mini category badges inside admin table cells */
+    .cat-badge-mini {
+      display: inline-block;
+      font-size: 0.7rem;
+      padding: 2px 7px;
+      border-radius: 10px;
+      background: rgba(44,31,22,0.07);
+      color: var(--brown);
+      margin: 1px 2px 1px 0;
+      white-space: nowrap;
+    }
   </style>
 </head>
 <body>
@@ -228,9 +264,11 @@ if ($authed) {
       </div>
 
       <div class="field">
-        <label for="edit-category">Category</label>
-        <input type="text" id="edit-category" name="category" maxlength="80" value="<?= htmlspecialchars($editJoke['category'] ?? '') ?>" placeholder="e.g. Animals, Food &amp; Drink…">
-        <div class="field-hint">Leave blank to assign via AI, or type a category directly.</div>
+        <label for="edit-category">Categories</label>
+        <input type="text" id="edit-category" name="category"
+               value="<?= htmlspecialchars(displayCategories($editJoke['category'] ?? '')) ?>"
+               placeholder="e.g. Animals, Wordplay &amp; Puns">
+        <div class="field-hint">Comma-separated. Leave blank to assign via AI, or type directly. Example: <em>Animals, Wordplay &amp; Puns</em></div>
       </div>
 
       <div class="modal-actions">
@@ -266,11 +304,14 @@ if ($authed) {
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:40px;padding:20px 24px;background:var(--warm-white);border:1px solid var(--sand);border-radius:var(--radius)">
       <div>
         <div style="font-family:var(--font-display);font-size:1rem;color:var(--espresso);margin-bottom:4px">AI Category Assignment</div>
-        <div style="font-size:0.82rem;color:var(--taupe)">Assign categories to all uncategorized jokes at once, or per-joke using the ✦ button in the tables below.</div>
+        <div style="font-size:0.82rem;color:var(--taupe)">Assign categories to uncategorized jokes in batches of 50, or per-joke using the ✦ button in the tables below. Each joke may receive multiple categories.</div>
       </div>
-      <button class="btn btn-primary" onclick="categorizeAll(this)" style="white-space:nowrap">
-        ✦ Categorize All Uncategorized
-      </button>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+        <button class="btn btn-primary" id="cat-batch-btn" onclick="startChunkedCategorize()" style="white-space:nowrap">
+          ✦ Categorize Uncategorized
+        </button>
+        <div id="cat-progress" style="display:none;font-size:0.82rem;color:var(--taupe);text-align:right"></div>
+      </div>
     </div>
 
     <!-- Pending Submissions -->
@@ -291,20 +332,27 @@ if ($authed) {
             <th>Setup</th>
             <th>Punchline</th>
             <th>Submitted by</th>
-            <th>Category</th>
+            <th>Categories</th>
             <th>Date</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           <?php foreach ($pending as $j): ?>
+          <?php $cats = parseCategories($j['category'] ?? null); ?>
           <tr id="joke-row-<?= $j['id'] ?>">
             <td style="max-width:200px"><?= htmlspecialchars($j['setup']) ?></td>
             <td style="max-width:200px;color:var(--brown);font-style:italic"><?= htmlspecialchars($j['punchline']) ?></td>
             <td><?= htmlspecialchars($j['submitted_by'] ?: 'Anonymous') ?></td>
             <td>
-              <span class="joke-cat-cell" id="cat-<?= $j['id'] ?>" style="font-size:0.8rem;color:var(--taupe)">
-                <?= $j['category'] ? htmlspecialchars($j['category']) : '<em>None</em>' ?>
+              <span class="joke-cat-cell" id="cat-<?= $j['id'] ?>">
+                <?php if (empty($cats)): ?>
+                  <em style="font-size:0.8rem;color:var(--taupe)">None</em>
+                <?php else: ?>
+                  <?php foreach ($cats as $c): ?>
+                    <span class="cat-badge-mini"><?= htmlspecialchars($c) ?></span>
+                  <?php endforeach ?>
+                <?php endif ?>
               </span>
             </td>
             <td style="color:var(--taupe);white-space:nowrap;font-size:0.8rem"><?= date('M j, Y', strtotime($j['created_at'])) ?></td>
@@ -316,7 +364,7 @@ if ($authed) {
                   <button type="submit" class="btn-admin-approve">✓ Approve</button>
                 </form>
                 <a href="?edit=<?= $j['id'] ?>" class="btn-admin-edit">✎ Edit</a>
-                <button class="btn-admin-categorize" onclick="categorizeSingle(<?= $j['id'] ?>, this)" title="AI-assign category">✦ Cat</button>
+                <button class="btn-admin-categorize" onclick="categorizeSingle(<?= $j['id'] ?>, this)" title="AI-assign categories">✦ Cat</button>
                 <form method="POST" style="display:inline" onsubmit="return confirm('Delete this joke permanently?')">
                   <input type="hidden" name="action"  value="delete">
                   <input type="hidden" name="joke_id" value="<?= $j['id'] ?>">
@@ -345,21 +393,28 @@ if ($authed) {
             <th>Setup</th>
             <th>Punchline</th>
             <th>By</th>
-            <th>Category</th>
+            <th>Categories</th>
             <th>Votes</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           <?php foreach ($approved as $j): ?>
+          <?php $cats = parseCategories($j['category'] ?? null); ?>
           <tr id="joke-row-<?= $j['id'] ?>">
             <td style="color:var(--taupe);font-size:0.8rem"><?= $j['id'] ?></td>
             <td style="max-width:180px"><?= htmlspecialchars($j['setup']) ?></td>
             <td style="max-width:180px;color:var(--brown);font-style:italic"><?= htmlspecialchars($j['punchline']) ?></td>
             <td style="font-size:0.82rem;color:var(--taupe)"><?= htmlspecialchars($j['submitted_by'] ?: 'Anon') ?></td>
             <td>
-              <span class="joke-cat-cell" id="cat-<?= $j['id'] ?>" style="font-size:0.8rem;color:var(--taupe)">
-                <?= $j['category'] ? htmlspecialchars($j['category']) : '<em>None</em>' ?>
+              <span class="joke-cat-cell" id="cat-<?= $j['id'] ?>">
+                <?php if (empty($cats)): ?>
+                  <em style="font-size:0.8rem;color:var(--taupe)">None</em>
+                <?php else: ?>
+                  <?php foreach ($cats as $c): ?>
+                    <span class="cat-badge-mini"><?= htmlspecialchars($c) ?></span>
+                  <?php endforeach ?>
+                <?php endif ?>
               </span>
             </td>
             <td>
@@ -371,7 +426,7 @@ if ($authed) {
             <td>
               <div class="admin-action-group">
                 <a href="?edit=<?= $j['id'] ?>" class="btn-admin-edit">✎ Edit</a>
-                <button class="btn-admin-categorize" onclick="categorizeSingle(<?= $j['id'] ?>, this)" title="AI-assign category">✦ Cat</button>
+                <button class="btn-admin-categorize" onclick="categorizeSingle(<?= $j['id'] ?>, this)" title="AI-assign categories">✦ Cat</button>
                 <form method="POST" style="display:inline" onsubmit="return confirm('Delete this joke and all its votes?')">
                   <input type="hidden" name="action"  value="delete">
                   <input type="hidden" name="joke_id" value="<?= $j['id'] ?>">
@@ -393,6 +448,16 @@ if ($authed) {
 <div id="toast"></div>
 
 <script>
+// ── Render mini category badges into a cell ─────────────────────────
+function renderCatBadges(categories) {
+  if (!categories || categories.length === 0) {
+    return '<em style="font-size:0.8rem;color:var(--taupe)">None</em>';
+  }
+  return categories.map(function(c) {
+    return '<span class="cat-badge-mini">' + escHtml(c) + '</span>';
+  }).join('');
+}
+
 // ── Single-joke categorize ──────────────────────────────────────────
 async function categorizeSingle(jokeId, btn) {
   var originalText = btn.textContent;
@@ -407,46 +472,74 @@ async function categorizeSingle(jokeId, btn) {
     var data = await res.json();
     if (data.success) {
       var cell = document.getElementById('cat-' + jokeId);
-      if (cell) { cell.innerHTML = escHtml(data.category); }
-      showToast('\u2714 Categorized as \u201c' + data.category + '\u201d');
+      if (cell) { cell.innerHTML = renderCatBadges(data.categories); }
+      var label = data.categories.join(', ');
+      showToast('\u2714 ' + (data.categories.length > 1 ? 'Categories' : 'Category') + ': ' + label);
     } else {
       showToast('Categorization failed.');
     }
   } catch (e) {
-    showToast('Request failed. Check Anthropic API key in categorize.php.');
+    showToast('Request failed. Check Anthropic API key in db.php.');
   }
   btn.disabled = false;
   btn.textContent = originalText;
 }
 
-// ── Categorize all uncategorized ────────────────────────────────────
-async function categorizeAll(btn) {
-  if (!confirm('This will call the AI API for every uncategorized joke. Proceed?')) return;
-  var originalText = btn.textContent;
-  btn.disabled = true;
+// ── Chunked batch categorize (50 at a time, loops until done) ────────
+var catBatchRunning = false;
+
+async function startChunkedCategorize() {
+  if (catBatchRunning) return;
+  var btn      = document.getElementById('cat-batch-btn');
+  var progress = document.getElementById('cat-progress');
+
+  btn.disabled    = true;
   btn.textContent = 'Working\u2026';
+  progress.style.display = 'block';
+  catBatchRunning = true;
+
+  var totalProcessed = 0;
+
   try {
-    var res  = await fetch('categorize.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: 'action=all'
-    });
-    var data = await res.json();
-    if (data.success) {
-      // Update all category cells that were returned
+    while (true) {
+      progress.textContent = totalProcessed + ' categorized so far\u2026';
+
+      var res  = await fetch('categorize.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'action=chunk&limit=50'
+      });
+      var data = await res.json();
+
+      if (!data.success) {
+        showToast('Batch failed. Check Anthropic API key in db.php.');
+        break;
+      }
+
+      totalProcessed += data.processed;
+
+      // Update any visible category cells
       (data.results || []).forEach(function(r) {
         var cell = document.getElementById('cat-' + r.id);
-        if (cell) { cell.innerHTML = escHtml(r.category); }
+        if (cell) { cell.innerHTML = renderCatBadges(r.categories); }
       });
-      showToast('\u2714 ' + data.processed + ' joke' + (data.processed !== 1 ? 's' : '') + ' categorized');
-    } else {
-      showToast('Batch categorization failed.');
+
+      if (data.remaining === 0 || data.processed === 0) {
+        progress.textContent = '\u2714 Done \u2014 ' + totalProcessed + ' joke' + (totalProcessed !== 1 ? 's' : '') + ' categorized';
+        showToast('\u2714 ' + totalProcessed + ' joke' + (totalProcessed !== 1 ? 's' : '') + ' categorized');
+        break;
+      }
+
+      progress.textContent = totalProcessed + ' done, ' + data.remaining + ' remaining\u2026';
     }
   } catch (e) {
-    showToast('Request failed. Check Anthropic API key in categorize.php.');
+    showToast('Request failed. Check Anthropic API key in db.php.');
+    progress.textContent = 'Failed after ' + totalProcessed + ' jokes.';
   }
-  btn.disabled = false;
-  btn.textContent = originalText;
+
+  btn.disabled    = false;
+  btn.textContent = '\u2726 Categorize Uncategorized';
+  catBatchRunning = false;
 }
 
 // ── Toast ────────────────────────────────────────────────────────────

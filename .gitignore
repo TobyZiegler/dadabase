@@ -10,9 +10,9 @@ db.php
 # (Uncomment to keep setup.sql out of git entirely; or leave it tracked for docs)
 setup.sql
 setup_admin.php
-bulk_upload.php
-bulk_download.php
-categorize.php
+#bulk_upload.php
+#bulk_download.php
+#categorize.php
 
 
 # Editor directories
@@ -52,3 +52,4 @@ Temporary Items
 .history
 
 # end file
+db.php

@@ -19,15 +19,15 @@ It is, in other words, the most dad thing imaginable: built with love, slightly 
 ## Features
 
 - 🎲 **Joke of the Moment** — A random joke spotlighted on the homepage with a theatrical reveal mechanic
-- 📂 **Browse Archive** — The full joke database, revealed on demand
-- 🔍 **Live Search** — Instant keyword search across setups and punchlines; also triggers the archive if searched before browsing
+- 📂 **Browse Archive** — The full joke database, revealed on demand; toggle open and closed
+- 🔍 **Live Search** — Instant keyword search across setups and punchlines; triggers the archive automatically if searched before browsing
 - 🏷️ **Category Filter** — Pill-button filter bar lets visitors browse by AI-assigned category
-- ➕ **Submit a Joke** — Visitor submissions enter a moderation queue; success screen offers to submit another
+- ➕ **Submit a Joke** — Visitor submissions enter a moderation queue; success screen auto-focuses "Submit Another" for fast follow-up submissions
 - 😄 **Vote** — Ha! or Groan on every joke; one vote per IP address per joke
-- 🔒 **Admin Panel** — Secure moderation interface for approving, editing, and deleting jokes
-- 🤖 **AI Categorization** — Claude API assigns categories to jokes individually or in batch from the admin panel
-- 📥 **Bulk Upload** — Import many jokes at once via CSV or JSON; choose approved or pending on import
-- 📤 **Bulk Download** — Export the full database (or approved/pending subsets) as CSV or JSON
+- 🔒 **Admin Panel** — Secure moderation interface for approving, editing, deleting, and categorizing jokes; database-backed bcrypt auth
+- 🤖 **AI Categorization** — Claude API assigns categories individually (per-joke ✦ button) or in batch (chunked 50 at a time) from the admin panel
+- 📥 **Bulk Upload** — Import many jokes at once via CSV or JSON; choose approved or pending status; optional AI-categorize-on-import
+- 📤 **Bulk Download** — Export approved, pending, or all jokes as CSV or JSON
 
 ---
 
@@ -169,13 +169,46 @@ Visit `http://localhost:8000`. You'll see a database connection error without a 
 
 ---
 
+## Troubleshooting
+
+### Every joke categorizes as "Miscellaneous"
+
+**Symptom:** AI categorization runs without error, but every joke comes back as `Miscellaneous`.
+
+**Cause:** `Miscellaneous` is the hard fallback in `categorizeJoke()` — it returns that value any time the API call fails for *any* reason. If every joke lands there, the Claude API call is failing silently before it ever gets a response.
+
+**How to diagnose:** `categorize.php` includes a `debug` action that runs a single test API call and returns full diagnostic output instead of touching the database. From your browser's dev tools console (or any REST client), POST to `categorize.php` with `action=debug`:
+
+```js
+// Paste in browser console while on the admin page
+fetch('categorize.php', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  body: 'action=debug'
+}).then(r => r.json()).then(console.log);
+```
+
+The response will tell you exactly what went wrong — cURL availability, HTTP status from Anthropic, the raw error message, and a prefix of the API key being used.
+
+**Common causes on Namecheap shared hosting:**
+
+1. **Outbound cURL is blocked or SSL verification is failing.** Shared hosts sometimes restrict outbound HTTPS connections or have outdated CA bundles. The debug response will show a cURL error string if this is the issue. Contact Namecheap support to confirm outbound port 443 is open for your plan.
+
+2. **The Anthropic API key in `db.php` is wrong, expired, or has no credits.** The debug response will show the HTTP status from Anthropic (401 = bad key, 429 = rate limit/quota). Verify the key at [console.anthropic.com](https://console.anthropic.com). Note that `db.php` is never committed to version control — if the file was recreated on the server manually, double-check the key was pasted correctly with no extra whitespace.
+
+3. **`db.php` is missing `ANTHROPIC_API_KEY`.** If `db.php` was created before the AI categorization feature was added, it may not have the `define('ANTHROPIC_API_KEY', ...)` line. The debug response will show a PHP notice or an empty key prefix.
+
+**After diagnosing:** Once you've identified the issue, re-run categorization from the admin panel. Jokes that were previously assigned `Miscellaneous` due to API failure will need to have their categories cleared first (edit each joke and blank the category field, or run a SQL update: `UPDATE jokes SET category = NULL WHERE category = 'Miscellaneous'`).
+
+---
+
 ## Origin Story
 
 The Dad-a-Base was built as the first showcase project for [TobyZiegler.com](https://tobyziegler.com) — a portfolio site for a graphic designer with 30+ years of experience who decided to learn AI-assisted software engineering.
 
 The application was built through conversation with **Claude** (Anthropic) — from database schema through deployment pipeline and iterative refinement — without writing code by hand. The project represents a workflow where domain expertise, design sensibility, and project management instincts drive the process, with AI handling implementation.
 
-The troubleshooting process was itself instructive: subdomain document root misconfiguration, the Namecheap cPanel username prefix convention for database names, and a JavaScript syntax error caused by PHP/JS mixing were the main obstacles, each diagnosed methodically through browser developer tools, terminal commands, and cPanel inspection.
+The troubleshooting process was itself instructive: subdomain document root misconfiguration, the Namecheap cPanel username prefix convention for database names, a JavaScript syntax error caused by PHP/JS mixing, and a silent API failure that manifested as every joke being categorized as "Miscellaneous" — each diagnosed methodically through browser developer tools, terminal commands, cPanel inspection, and adding targeted diagnostic output to the failing code.
 
 ---
 
