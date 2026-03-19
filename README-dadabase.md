@@ -21,11 +21,11 @@ It is, in other words, the most dad thing imaginable: built with love, slightly 
 - 🎲 **Joke of the Moment** — A random joke spotlighted on the homepage with a theatrical reveal mechanic
 - 📂 **Browse Archive** — The full joke database, revealed on demand; toggle open and closed
 - 🔍 **Live Search** — Instant keyword search across setups and punchlines; triggers the archive automatically if searched before browsing
-- 🏷️ **Category Filter** — Pill-button filter bar lets visitors browse by AI-assigned category
+- 🏷️ **Category Filter** — Pill-button filter bar lets visitors browse by AI-assigned category; filter and search work together
 - ➕ **Submit a Joke** — Visitor submissions enter a moderation queue; success screen auto-focuses "Submit Another" for fast follow-up submissions
 - 😄 **Vote** — Ha! or Groan on every joke; one vote per IP address per joke
 - 🔒 **Admin Panel** — Secure moderation interface for approving, editing, deleting, and categorizing jokes; database-backed bcrypt auth
-- 🤖 **AI Categorization** — Claude API assigns categories individually (per-joke ✦ button) or in batch (chunked 50 at a time) from the admin panel
+- 🤖 **AI Categorization** — Claude API assigns one or more categories per joke — a pun about animals correctly lands in both Animals and Wordplay & Puns. Categories can be assigned individually (per-joke ✦ button) or in bulk (chunked 50 at a time) from the admin panel
 - 📥 **Bulk Upload** — Import many jokes at once via CSV or JSON; choose approved or pending status; optional AI-categorize-on-import
 - 📤 **Bulk Download** — Export approved, pending, or all jokes as CSV or JSON
 
@@ -46,7 +46,7 @@ Accessibility was a priority throughout: contrast ratios are strong across the p
 | Frontend | HTML5, CSS3, Vanilla JavaScript |
 | Backend | PHP 8.1 |
 | Database | MySQL 8 via PDO |
-| AI | Claude API (Anthropic) — joke categorization |
+| AI | Claude API (Anthropic) — multi-category joke classification |
 | Hosting | Namecheap Shared Hosting (cPanel) |
 | Deployment | Git Version Control via cPanel |
 | Version Control | Git / GitHub |
@@ -85,7 +85,7 @@ dadabase.tobyziegler.com/
 | setup | TEXT | The question or premise |
 | punchline | TEXT | The payoff |
 | submitted_by | VARCHAR(100) | Visitor name or 'Anonymous' |
-| category | VARCHAR(80) | AI-assigned category (nullable) |
+| category | TEXT | JSON array of AI-assigned categories, e.g. `["Animals","Wordplay & Puns"]` (nullable) |
 | status | ENUM | `approved` or `pending` |
 | ha_count | INT UNSIGNED | Total Ha! votes |
 | groan_count | INT UNSIGNED | Total Groan votes |
@@ -117,7 +117,10 @@ dadabase.tobyziegler.com/
 1. In cPanel, create a subdomain pointed at a document root of `dadabase.tobyziegler.com`
 2. Create a MySQL database and user in cPanel's MySQL Databases tool. Note that Namecheap prepends your cPanel username to all database and user names — e.g. `username_dbname`
 3. Run `setup.sql` in phpMyAdmin to create the `jokes` and `votes` tables and seed starter jokes
-4. Run `migration_add_category.sql` in phpMyAdmin to add the `category` column and create the `admins` table
+4. Run the following in phpMyAdmin to set up the category column and admins table:
+   ```sql
+   ALTER TABLE jokes MODIFY COLUMN category TEXT NULL DEFAULT NULL;
+   ```
 5. Create `db.php` on the server (never commit this file — it contains all credentials):
 
 ```php
@@ -135,7 +138,7 @@ define('ANTHROPIC_API_KEY', 'your_anthropic_api_key');
 This project uses cPanel's **Git Version Control** tool. Push changes to GitHub, then pull them into the server using the "Update from Remote" button in the Pull or Deploy tab.
 
 The following files are intentionally **excluded from deployment** via `.gitignore`:
-- `db.php` — contains all live credentials; created manually on server
+- `db.php` — contains all live credentials; created manually on server; **never commit this file**
 - `setup.sql` — run once manually, never overwritten
 - `setup_admin.php` — one-time account creator; delete immediately after use
 - `bulk_upload.php` — admin tool; kept server-side only
@@ -143,6 +146,21 @@ The following files are intentionally **excluded from deployment** via `.gitigno
 - `categorize.php` — reads API key from `db.php`; kept server-side only
 - `.github/` — workflow files
 - `.DS_Store` — macOS metadata
+
+### Migrating from Single-Category to Multi-Category
+
+If upgrading from an earlier version that stored categories as plain strings (e.g. `Animals`), run this migration after deploying the updated files:
+
+```js
+// Paste in browser console while on the admin page
+fetch('categorize.php', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  body: 'action=migrate'
+}).then(r => r.json()).then(console.log);
+```
+
+This wraps every existing plain-string category into a JSON array. It is idempotent — safe to run multiple times. The response reports how many rows were converted.
 
 ### Local Development
 
@@ -159,7 +177,7 @@ Visit `http://localhost:8000`. You'll see a database connection error without a 
 
 ## Security Notes
 
-- `db.php` is never committed to the repository. It contains all credentials — database password and Anthropic API key — and lives only on the server, created manually via cPanel File Manager or SFTP.
+- `db.php` is never committed to the repository. It contains all credentials — database password and Anthropic API key — and lives only on the server, created manually via cPanel File Manager or SFTP. If it is ever accidentally committed, remove it from Git tracking immediately with `git rm --cached db.php`, rewrite or remove the offending commit, force-push, and rotate all credentials.
 - Admin authentication uses a database-backed `admins` table. Passwords are stored as bcrypt hashes (cost 12) via PHP's `password_hash()` and verified with `password_verify()`. No plaintext password exists anywhere in the codebase.
 - The `setup_admin.php` script self-deletes after creating the first account. If it fails to delete, remove it manually — it creates admin access with no prior authentication.
 - Votes are limited to one per IP address per joke. This is a lightweight measure — a determined person with a VPN can circumvent it. For a joke database, this is an acceptable tradeoff.
@@ -188,7 +206,17 @@ fetch('categorize.php', {
 }).then(r => r.json()).then(console.log);
 ```
 
-The response will tell you exactly what went wrong — cURL availability, HTTP status from Anthropic, the raw error message, and a prefix of the API key being used.
+A healthy response looks like:
+```json
+{
+  "success": true,
+  "categories": ["Science & Math", "Wordplay & Puns"],
+  "error": null,
+  "api_key_prefix": "sk-ant-api03-…",
+  "model": "claude-sonnet-4-20250514",
+  "curl_available": true
+}
+```
 
 **Common causes on Namecheap shared hosting:**
 
@@ -196,9 +224,13 @@ The response will tell you exactly what went wrong — cURL availability, HTTP s
 
 2. **The Anthropic API key in `db.php` is wrong, expired, or has no credits.** The debug response will show the HTTP status from Anthropic (401 = bad key, 429 = rate limit/quota). Verify the key at [console.anthropic.com](https://console.anthropic.com). Note that `db.php` is never committed to version control — if the file was recreated on the server manually, double-check the key was pasted correctly with no extra whitespace.
 
-3. **`db.php` is missing `ANTHROPIC_API_KEY`.** If `db.php` was created before the AI categorization feature was added, it may not have the `define('ANTHROPIC_API_KEY', ...)` line. The debug response will show a PHP notice or an empty key prefix.
+3. **`db.php` is missing or missing `ANTHROPIC_API_KEY`.** The server will return a 500 error. Check that `db.php` exists on the server (it is never deployed via Git — it must be created manually) and that it contains the `define('ANTHROPIC_API_KEY', ...)` line.
 
-**After diagnosing:** Once you've identified the issue, re-run categorization from the admin panel. Jokes that were previously assigned `Miscellaneous` due to API failure will need to have their categories cleared first (edit each joke and blank the category field, or run a SQL update: `UPDATE jokes SET category = NULL WHERE category = 'Miscellaneous'`).
+**After diagnosing:** Once you've identified the issue, re-run categorization from the admin panel. Jokes previously assigned `Miscellaneous` due to API failure will need their categories cleared first:
+
+```sql
+UPDATE jokes SET category = NULL WHERE category = '["Miscellaneous"]';
+```
 
 ---
 
@@ -208,13 +240,14 @@ The Dad-a-Base was built as the first showcase project for [TobyZiegler.com](htt
 
 The application was built through conversation with **Claude** (Anthropic) — from database schema through deployment pipeline and iterative refinement — without writing code by hand. The project represents a workflow where domain expertise, design sensibility, and project management instincts drive the process, with AI handling implementation.
 
-The troubleshooting process was itself instructive: subdomain document root misconfiguration, the Namecheap cPanel username prefix convention for database names, a JavaScript syntax error caused by PHP/JS mixing, and a silent API failure that manifested as every joke being categorized as "Miscellaneous" — each diagnosed methodically through browser developer tools, terminal commands, cPanel inspection, and adding targeted diagnostic output to the failing code.
+The troubleshooting process was itself instructive: subdomain document root misconfiguration, the Namecheap cPanel username prefix convention for database names, a JavaScript syntax error caused by PHP/JS mixing, a silent API failure that manifested as every joke being categorized as "Miscellaneous," and — during the multi-category upgrade — credentials accidentally committed to a public repository, caught immediately by GitHub's secret scanning and resolved by rewriting commit history and rotating keys. Each obstacle diagnosed methodically and documented here.
 
 ---
 
 ## What's Next
 
 - [x] Joke categories with AI assignment
+- [x] Multi-category support — each joke can belong to as many categories as apply
 - [x] Category filter on public archive
 - [x] Bulk upload (CSV and JSON)
 - [x] Bulk download (CSV and JSON)

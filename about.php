@@ -275,8 +275,9 @@
   <h1 class="about-title">How this was <em>built.</em></h1>
   <p class="about-subtitle">
     The Dad-a-Base is a fully functional web application — search, voting,
-    moderation, admin panel and all — built without writing a single line
-    of code by hand. Here&rsquo;s the story of how that works, and why it matters.
+    moderation, AI categorization, admin panel and all — built without writing
+    a single line of code by hand. Here&rsquo;s the story of how that works,
+    and why it matters.
   </p>
 
   <!-- ── Origin Story ─────────────────────────────────────────────── -->
@@ -336,9 +337,11 @@
       <li><span class="feat-name">Joke of the Moment</span> A random joke spotlighted on the homepage with a theatrical reveal mechanic and inline voting</li>
       <li><span class="feat-name">Browse Archive</span> The full joke database, revealed on demand and toggleable &mdash; loads only when you ask for it</li>
       <li><span class="feat-name">Live Search</span> Instant keyword search across setups and punchlines; triggers the archive automatically if you search before browsing</li>
+      <li><span class="feat-name">AI Categorization</span> Claude assigns one or more categories to each joke &mdash; a pun about animals lands in both Animals and Wordplay &amp; Puns. Categories can be assigned per-joke or in bulk from the admin panel</li>
+      <li><span class="feat-name">Category Filter</span> Pill-button filter bar lets visitors browse the archive by category; filter and search work together</li>
       <li><span class="feat-name">Submit a Joke</span> Visitor submissions enter a moderation queue before going live; the success screen invites you to submit another</li>
       <li><span class="feat-name">Ha! / Groan Voting</span> One vote per joke per visitor; counts update live without a page reload</li>
-      <li><span class="feat-name">Admin Panel</span> Password-protected interface for approving, editing, and deleting jokes &mdash; with a sticky header, naturally</li>
+      <li><span class="feat-name">Admin Panel</span> Password-protected interface for approving, editing, categorizing, and deleting jokes &mdash; with bulk import and export tools</li>
     </ul>
   </div>
 
@@ -349,6 +352,7 @@
       <tr><td>Frontend</td><td>HTML5, CSS3, Vanilla JavaScript</td></tr>
       <tr><td>Backend</td><td>PHP 8.1</td></tr>
       <tr><td>Database</td><td>MySQL 8 via PDO</td></tr>
+      <tr><td>AI</td><td>Claude API (Anthropic) &mdash; multi-category joke classification</td></tr>
       <tr><td>Hosting</td><td>Namecheap Shared Hosting (cPanel)</td></tr>
       <tr><td>Deployment</td><td>Git Version Control via cPanel</td></tr>
       <tr><td>Source Control</td><td>Git &amp; GitHub</td></tr>
@@ -361,7 +365,7 @@
   <div class="about-section">
     <div class="about-section-label">What Went Wrong (And How It Got Fixed)</div>
     <p>
-      The troubleshooting process was as instructive as the building. Three obstacles
+      The troubleshooting process was as instructive as the building. Several obstacles
       stood between a working codebase and a working website:
     </p>
     <div class="obstacle-list">
@@ -396,6 +400,18 @@
           immune to any character a visitor might type into a submission.
         </div>
       </div>
+      <div class="obstacle-card">
+        <div class="obstacle-label">Credentials in Version Control</div>
+        <div class="obstacle-desc">
+          During deployment of the multi-category update, <code style="font-size:0.88em;background:var(--cream);padding:1px 6px;border-radius:4px">db.php</code>
+          &mdash; the file containing the database password and Anthropic API key &mdash;
+          was accidentally committed to the public GitHub repository. GitHub&rsquo;s secret
+          scanning caught it immediately and blocked the push. The commit was surgically
+          removed from history, the credentials were rotated, and
+          <code style="font-size:0.88em;background:var(--cream);padding:1px 6px;border-radius:4px">db.php</code> was
+          permanently removed from Git tracking. A lesson learned once, remembered permanently.
+        </div>
+      </div>
     </div>
   </div>
 
@@ -407,7 +423,6 @@
     Planned improvements to this project include:</p>
     <ul class="next-list">
       <li>Pagination for large joke counts</li>
-      <li>Joke categories and tags</li>
       <li>Top-rated jokes leaderboard</li>
       <li>Social sharing buttons</li>
       <li>Joke of the Day feature</li>
