@@ -70,7 +70,8 @@ dadabase.tobyziegler.com/
 ├── bulk_download.php     # Admin tool — export jokes as CSV or JSON
 ├── categorize.php        # Server-side Claude API endpoint for AI category assignment
 ├── db.php                # Database connection + all credentials (never committed)
-├── style.css             # Full site stylesheet
+├── shared.css            # Full site stylesheet
+├── style.css             # dadabase site stylesheet
 └── setup.sql             # Database schema + seed data (run once, never deployed)
 ```
 

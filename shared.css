@@ -1,0 +1,272 @@
+/*
+ * shared.css — Toby's Study design system
+ * Canonical source: tobyziegler.com/assets/shared.css
+ * Deploy copies to: dadabase.tobyziegler.com/shared.css
+ *                   resume.tobyziegler.com/shared.css
+ *
+ * When this file changes, update the version comment below and
+ * redeploy all copies before pushing page-level changes.
+ *
+ * Version: 1.0 — 2026-03-24
+ */
+
+/* ─── Google Fonts ──────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..500&display=swap');
+
+/*
+ * NOTE: The Study's index.html loads fonts via <link> tags in <head>
+ * (faster — avoids @import render-blocking delay). The Dad-a-Base and
+ * Resume load this file as a <link> from <head>, so @import is fine.
+ * The Study should keep its own <link> tags and NOT import this file's
+ * font section. Everything else applies to all rooms.
+ */
+
+
+/* ─── CSS Custom Properties ─────────────────────────────────────────── */
+:root {
+
+  /* Surfaces */
+  --bg:           #F5F0E8;   /* warm parchment — walls */
+  --bg-alt:       #EDE6D8;   /* slightly darker — alternating sections */
+  --bg-dark:      #1C1712;   /* near-black warm — footer, dark sections */
+  --white-soft:   #FAF7F2;   /* breathing room — cards, inputs */
+
+  /* Text */
+  --text:         #2C1F14;   /* deep espresso — primary */
+  --text-muted:   #6B5744;   /* mid-brown — secondary copy */
+
+  /* Accents */
+  --green:        #3A5C3B;   /* forest green — primary accent */
+  --burg:         #7B2D3A;   /* burgundy — secondary accent */
+
+  /* Structural */
+  --rule:         rgba(44, 31, 20, 0.15);   /* dividers, borders */
+  --rule-strong:  rgba(44, 31, 20, 0.28);   /* heavier borders */
+
+  /* Typography */
+  --font-display: 'Lora', Georgia, serif;
+  --font-body:    'DM Sans', sans-serif;
+
+  /* Type scale — use these instead of raw rem values */
+  --text-xs:    1.0rem;   /* fine print, footnotes */
+  --text-sm:    1.1rem;   /* eyebrows, labels, small UI */
+  --text-base:  1.3rem;   /* UI copy, captions, nav */
+  --text-body:  1.6rem;   /* body paragraphs */
+  --text-lg:    2.0rem;   /* credentials, pull quotes */
+
+  /* Elevation */
+  --shadow-card: 0 2px 16px rgba(44, 31, 20, 0.08), 0 1px 3px rgba(44, 31, 20, 0.06);
+  --shadow-lift: 0 8px 32px rgba(44, 31, 20, 0.13), 0 2px 8px rgba(44, 31, 20, 0.08);
+
+  /* Shape */
+  --radius-sm:   0.4rem;
+  --radius:      1.0rem;
+  --radius-lg:   1.75rem;
+  --radius-pill: 1.25rem;   /* pill buttons */
+
+  /* Motion */
+  --transition:  0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+/* ─── Reset ─────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;   /* IMPORTANT: must be on html, not body —
+                           body + overflow-x: hidden breaks pointer
+                           events on position: fixed children (nav) */
+}
+
+
+/* ─── Base ──────────────────────────────────────────────────────────── */
+body {
+  background-color: var(--bg);
+  background-image: url('assets/ParchmentPattern01.png');
+  background-repeat: repeat;
+  background-size: auto;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: clamp(16px, 1.25vw + 0.5rem, 26px);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/*
+ * ASSET PATH NOTE: The parchment background path is relative to each
+ * page's location. All rooms currently keep assets/ at the same level
+ * as their index file, so 'assets/ParchmentPattern01.png' works for
+ * all of them. If a room moves its assets folder, override body
+ * background-image locally in that page's <style> block.
+ */
+
+
+/* ─── Noise Texture Overlay ─────────────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;   /* below page content; fixed so it tiles without scrolling */
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+
+
+/* ─── Keyframes ─────────────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(1.2rem); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(1.2em); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+@keyframes scrollPulse {
+  0%, 100% { opacity: 1; transform: scaleY(1); }
+  50%       { opacity: 0.3; transform: scaleY(0.6); }
+}
+
+@keyframes expandDown {
+  from { opacity: 0; transform: translateY(-0.75rem); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+
+/* ─── Button System ─────────────────────────────────────────────────── */
+/*
+ * All pill buttons share these fundamentals. The display/size of the
+ * base .btn class is set here; .btn-primary and .btn-secondary add color.
+ * Each page may add page-specific button variants (e.g. .btn-assess)
+ * in their local <style> block — using these tokens for consistency.
+ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 1.6rem;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  border-radius: var(--radius-pill);
+  border: 0.2em solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.22s, color 0.22s, border-color 0.22s, transform 0.18s;
+}
+
+.btn-primary {
+  background: var(--green);
+  color: var(--white-soft);
+  border-color: var(--green);
+}
+
+.btn-primary:hover {
+  background: transparent;
+  color: var(--green);
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--rule-strong);
+}
+
+.btn-secondary:hover {
+  border-color: var(--burg);
+  color: var(--burg);
+  transform: translateY(-2px);
+}
+
+.btn-arrow {
+  font-size: 1.4em;
+  line-height: 1;
+  transition: transform 0.2s;
+}
+
+.btn-primary:hover .btn-arrow,
+.btn-secondary:hover .btn-arrow {
+  transform: translateX(4px);
+}
+
+/* Focus ring — keyboard nav */
+.btn:focus-visible,
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible {
+  outline: 3px solid var(--green);
+  outline-offset: 3px;
+}
+
+
+/* ─── Eyebrow Label Pattern ─────────────────────────────────────────── */
+/*
+ * The line + small-caps text pattern that labels sections throughout
+ * the ecosystem. Color of the line and text varies per section but
+ * the structure is always the same.
+ *
+ * Usage:
+ *   <div class="eyebrow">
+ *     <span class="eyebrow-line"></span>
+ *     <span class="eyebrow-text">The Work</span>
+ *   </div>
+ *
+ * Override color on the parent element or with a modifier class:
+ *   .eyebrow--burg .eyebrow-line  { background: var(--burg); }
+ *   .eyebrow--burg .eyebrow-text  { color: var(--burg); }
+ */
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.eyebrow-line {
+  width: 2.5rem;
+  height: 1.5px;
+  background: var(--green);
+  flex-shrink: 0;
+}
+
+.eyebrow-text {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--green);
+}
+
+/* Burgundy variant */
+.eyebrow--burg .eyebrow-line { background: var(--burg); }
+.eyebrow--burg .eyebrow-text { color: var(--burg); }
