@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dad-a-Base — The World's Finest Dad Joke Database</title>
   <meta name="description" content="A lovingly curated collection of the world's finest dad jokes. Search, vote, and submit your own.">
-  <link rel="stylesheet" href="shared.css">
-  <link rel="stylesheet" href="style.css"></head>
+  <link rel="stylesheet" href="shared.css?v=20260326">
+  <link rel="stylesheet" href="style.css?v=20260326"></head>
 <body>
 
 <!-- ─── Header ─────────────────────────────────────────────────────── -->
@@ -59,7 +59,7 @@
 <section class="section" id="browse">
   <div class="section-header">
     <div>
-      <h2 class="italic">Ready when you are.</h2>
+      <h2><em>Ready when you are.</em></h2>
       <p class="section-subtitle">Browse the full archive or search below to find a specific joke.</p>
     </div>
     <div class="section-header-right">

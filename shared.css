@@ -153,14 +153,13 @@ body::before {
  *   <h2>The <em class="burg">full</em> archive.</h2>
  * To make an entire heading italic (e.g. "Ready when you are."):
  *   <h2><em>Ready when you are.</em></h2>
- *   or wrap the whole heading: <h2 style="font-style:italic">…</h2>
  *   or add a local modifier class in the page stylesheet.
  */
 
 h1 {
   font-family: var(--font-display);
   font-size: clamp(3rem, 5vw, 4.5rem);
-  font-weight: 300;
+  font-weight: 500;
   letter-spacing: -0.03em;
   color: var(--text);
   line-height: 1.15;
@@ -169,14 +168,13 @@ h1 {
 
 h1 em {
   font-style: italic;
-  font-weight: 400;
   /* color inherits from .burg/.green on parent, or stays --text */
 }
 
 h2 {
   font-family: var(--font-display);
   font-size: clamp(1.8rem, 3vw, 2.4rem);
-  font-weight: 300;
+  font-weight: 500;
   letter-spacing: -0.02em;
   color: var(--text);
   line-height: 1.25;
@@ -184,15 +182,6 @@ h2 {
 
 h2 em {
   font-style: italic;
-  font-weight: 400;
-}
-
-/* h2 used as a display-italic heading (e.g. "Ready when you are.") */
-h2.italic {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 400;
-  letter-spacing: -0.01em;
 }
 
 h3 {
@@ -206,7 +195,6 @@ h3 {
 
 h3 em {
   font-style: italic;
-  font-weight: 400;
 }
 
 p {
