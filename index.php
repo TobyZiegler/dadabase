@@ -31,8 +31,10 @@
       All in one place, curated with exactly as much care as they deserve.
     </p>
     <div class="hero-actions">
+      <!--
       <button onclick="revealArchive()" class="btn btn-primary">Show all the jokes</button>
       <a href="submit.php" class="btn btn-secondary">Submit Yours</a>
+      -->
     </div>
   </div>
 
@@ -56,35 +58,37 @@
 <!-- ─── Browse Section ─────────────────────────────────────────────── -->
 <section class="section" id="browse">
   <div class="section-header">
-    <h2 class="section-title">The <em>full</em> archive.</h2>
-    <span class="section-count" id="joke-count"></span>
+    <div>
+      <h2 class="section-title-cursive">Ready when you are.</h2>
+      <p class="section-subtitle">Browse the full archive or search below to find a specific joke.</p>
+    </div>
+    <div class="section-header-right">
+      <span class="section-count" id="joke-count"></span>
+      <button onclick="revealArchive()" id="show-all-btn" class="btn btn-primary">Show all the jokes</button>
+    </div>
   </div>
 
-  <div class="search-wrapper">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-    </svg>
-    <input
-      type="search"
-      id="search-input"
-      placeholder="Search setups and punchlines&hellip;"
-      autocomplete="off"
-      oninput="handleSearch()"
-    >
+  <div class="search-row">
+    <div class="search-wrapper">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input
+        type="search"
+        id="search-input"
+        placeholder="Search setups and punchlines&hellip;"
+        autocomplete="off"
+        oninput="handleSearch()"
+      >
+    </div>
+    <button class="btn btn-secondary btn-search" onclick="triggerSearch()">Search</button>
   </div>
 
   <!-- Category filter pills — populated dynamically -->
   <div id="category-filter-bar" style="display:none;flex-wrap:wrap;gap:8px;margin-bottom:28px"></div>
 
   <!-- Hidden until Browse is clicked or search is used -->
-  <div id="archive-prompt" style="text-align:center;padding:48px 20px">
-    <div style="font-family:var(--font-display);font-size:1.3rem;font-weight:400;color:var(--brown);margin-bottom:16px">
-      Ready when you are.
-    </div>
-    <p style="color:var(--taupe);font-size:0.95rem;margin-bottom:28px">
-      Browse the full archive or search above to find a specific joke.
-    </p>
-    <button onclick="revealArchive()" class="btn btn-primary">Show all the jokes</button>
+  <div id="archive-prompt" style="padding:48px 0 24px 0">
   </div>
 
   <div id="jokes-grid" style="display:none"></div>
@@ -114,11 +118,18 @@ let searchTimer   = null;
 let archiveLoaded = false;
 let activeCategory = ''; // '' = All
 
+// ── Footer sticky state ─────────────────────────────────────────────
+function setFooterSticky(sticky) {
+  var footer = document.querySelector('.site-footer');
+  if (footer) footer.classList.toggle('footer-sticky', sticky);
+}
+
 // ── Reveal / toggle archive ─────────────────────────────────────────
 function revealArchive() {
   var prompt = document.getElementById('archive-prompt');
   var grid   = document.getElementById('jokes-grid');
   var catBar = document.getElementById('category-filter-bar');
+  var btn    = document.getElementById('show-all-btn');
 
   if (!archiveLoaded) {
     prompt.style.display = 'none';
@@ -127,17 +138,40 @@ function revealArchive() {
     archiveLoaded = true;
     loadCategories();
     loadJokes();
+    if (btn) btn.textContent = 'Hide the jokes';
+    setFooterSticky(true);
   } else if (grid.style.display === 'none') {
     prompt.style.display = 'none';
     grid.style.display   = 'grid';
     catBar.style.display = 'flex';
+    if (btn) btn.textContent = 'Hide the jokes';
+    setFooterSticky(true);
   } else {
     grid.style.display   = 'none';
     catBar.style.display = 'none';
     prompt.style.display = 'block';
+    if (btn) btn.textContent = 'Show all the jokes';
+    setFooterSticky(false);
   }
 
   document.getElementById('browse').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ── Search button trigger ───────────────────────────────────────────
+function triggerSearch() {
+  var prompt = document.getElementById('archive-prompt');
+  var grid   = document.getElementById('jokes-grid');
+  var catBar = document.getElementById('category-filter-bar');
+  if (prompt.style.display !== 'none') {
+    prompt.style.display = 'none';
+    grid.style.display   = 'grid';
+    catBar.style.display = 'flex';
+    archiveLoaded = true;
+    loadCategories();
+    setFooterSticky(true);
+  }
+  var q = document.getElementById('search-input').value.trim();
+  loadJokes(q);
 }
 
 // ── Load category pills ─────────────────────────────────────────────
@@ -161,7 +195,12 @@ function renderCategoryPills(cats) {
 }
 
 function filterByCategory(cat) {
-  activeCategory = cat;
+  // Clicking the active category (including All='') deselects it back to All
+  if (cat !== '' && cat === activeCategory) {
+    activeCategory = '';
+  } else {
+    activeCategory = cat;
+  }
   fetch('jokes.php?action=categories')
     .then(function(r) { return r.json(); })
     .then(renderCategoryPills)
@@ -306,6 +345,7 @@ function handleSearch() {
     catBar.style.display = 'flex';
     archiveLoaded = true;
     loadCategories();
+    setFooterSticky(true);
   }
   clearTimeout(searchTimer);
   searchTimer = setTimeout(function() {

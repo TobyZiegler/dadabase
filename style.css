@@ -354,8 +354,33 @@
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  margin-bottom: 2.5rem;
+  margin-bottom: 2rem;
   gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.section-header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+/* "Ready when you are." — full cursive display, same weight as old h2 */
+.section-title-cursive {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+
+.section-subtitle {
+  font-size: var(--text-base);
+  color: var(--text-muted);
+  font-weight: 400;
 }
 
 .section-title {
@@ -378,9 +403,27 @@
 }
 
 
+/* ─── Search Row ────────────────────────────────────────────────────── */
+.search-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+}
+
+.search-row .search-wrapper {
+  flex: 1;
+  margin-bottom: 0;   /* override standalone margin */
+}
+
+.btn-search {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+
 /* ─── Search Bar ────────────────────────────────────────────────────── */
 .search-wrapper {
-  margin-bottom: 2.5rem;
   position: relative;
 }
 
@@ -746,6 +789,21 @@
   justify-content: space-between;
   gap: 1.5rem;
   flex-wrap: wrap;
+  transition: padding 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              background 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Sticky compact footer — applied via JS when jokes grid is visible */
+.site-footer.footer-sticky {
+  position: sticky;
+  bottom: 0;
+  z-index: 90;   /* below header (100) but above joke cards */
+  padding: 0.7rem 3rem;
+  background: rgba(245, 240, 232, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 -4px 20px rgba(44, 31, 20, 0.10);
 }
 
 .footer-brand {
@@ -1029,10 +1087,14 @@
   .divider { padding: 0 1.5rem; }
 
   .site-footer { padding: 2rem 1.5rem; }
+  .site-footer.footer-sticky { padding: 0.7rem 1.5rem; }
 
   .admin-header { padding: 1.25rem 1.5rem; }
 
   .submit-card { padding: 2.25rem 1.75rem; }
+
+  .section-header { flex-direction: column; align-items: flex-start; }
+  .section-header-right { width: 100%; justify-content: space-between; }
 }
 
 @media (max-width: 600px) {
