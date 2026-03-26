@@ -14,7 +14,7 @@
  *   — Reset
  *   — Base body (background, font, noise overlay)
  *   — Typographic element selectors: h1–h3, p, em, strong
- *   — Semantic utility classes: .site-name, .tagline, .burg, .green, .muted
+ *   — Semantic utility classes: .room-name, .tagline, .burg, .green, .muted
  *   — Site chrome: .site-header, .site-footer and their children
  *   — Button system: .btn, .btn-primary, .btn-secondary
  *   — Eyebrow label pattern
@@ -189,6 +189,7 @@ h2 em {
 
 /* h2 used as a display-italic heading (e.g. "Ready when you are.") */
 h2.italic {
+  font-family: var(--font-display);
   font-style: italic;
   font-weight: 400;
   letter-spacing: -0.01em;
@@ -210,8 +211,6 @@ h3 em {
 
 p {
   font-family: var(--font-body);
-  font-size: var(--text-body);
-  color: var(--text);
   line-height: 1.7;
 }
 
@@ -237,18 +236,18 @@ em {
 .muted { color: var(--text-muted); }
 
 
-/* ─── Semantic Utility: .site-name and .tagline ─────────────────────── */
+/* ─── Semantic Utility: .room-name and .tagline ─────────────────────── */
 /*
- * .site-name — the name of the room/site wherever it appears:
+ * .room-name — the name of the room/site wherever it appears:
  *   header logo, footer, admin panel, any page title treatment.
  *   Lora bold. Not a heading level — it's a proper noun.
  *   Apply directly to an <a>, <span>, or <div>.
  *
- * .tagline — one supporting line: beneath a .site-name, beneath a
+ * .tagline — one supporting line: beneath a .room-name, beneath a
  *   section heading, or anywhere a quiet secondary note is needed.
  *   Replaces .footer-tagline and any other one-off muted-small-text classes.
  */
-.site-name {
+.room-name {
   font-family: var(--font-display);
   font-size: var(--text-body);
   font-weight: 700;
@@ -276,7 +275,7 @@ em {
  * HTML pattern:
  *   <header class="site-header">
  *     <a href="index.php" class="logo">
- *       <span class="site-name">Dad-a-Base</span>
+ *       <span class="room-name">Dad-a-Base</span>
  *       <span class="logo-badge">Est. 2025</span>   ← optional
  *     </a>
  *     <nav class="header-nav">
@@ -371,7 +370,7 @@ em {
  *
  *   <footer class="site-footer">
  *     <div>
- *       <span class="site-name">Dad-a-Base</span>
+ *       <span class="room-name">Dad-a-Base</span>
  *       <span class="tagline">Here whether you like it or not.</span>
  *     </div>
  *     <nav class="footer-nav">

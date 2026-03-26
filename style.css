@@ -4,7 +4,7 @@
  *
  * Depends on shared.css loaded first. shared.css provides:
  *   tokens, reset, body, noise overlay, h1–h3 + em/strong,
- *   .site-name, .tagline, .burg/.green/.muted color helpers,
+ *   .room-name, .tagline, .burg/.green/.muted color helpers,
  *   .site-header/.site-footer and their children,
  *   .btn system, .eyebrow pattern, keyframes.
  *
@@ -624,8 +624,8 @@ body.archive-open #browse {
   z-index: 100;
 }
 
-/* .site-name on dark background needs a color override */
-.admin-header .site-name { color: var(--white-soft); }
+/* .room-name on dark background needs a color override */
+.admin-header .room-name { color: var(--white-soft); }
 
 .admin-nav a {
   font-size: var(--text-sm);
