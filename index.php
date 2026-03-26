@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dad-a-Base — The World's Finest Dad Joke Database</title>
   <meta name="description" content="A lovingly curated collection of the world's finest dad jokes. Search, vote, and submit your own.">
-  <link rel="stylesheet" href="shared.css">
-  <link rel="stylesheet" href="style.css"></head>
+  <link rel="stylesheet" href="shared.css?v=20260326">
+  <link rel="stylesheet" href="style.css?v=20260326"></head>
 <body>
 
 <!-- ─── Header ─────────────────────────────────────────────────────── -->
@@ -118,7 +118,6 @@ let searchTimer     = null;
 let archiveLoaded   = false;
 let archiveVisible  = false;
 let activeCategories = new Set(); // empty = All
-let knownCategories  = [];        // cached after first load — never re-fetched
 
 // ── Single source of truth for archive show/hide state ──────────────
 function setArchiveState(show) {
@@ -186,18 +185,18 @@ async function loadCategories() {
   try {
     var res  = await fetch('jokes.php?action=categories');
     var cats = await res.json();
-    knownCategories = cats;       // cache for all future renders
-    renderCategoryPills();
+    renderCategoryPills(cats);
   } catch (e) { /* silently skip if endpoint not ready */ }
 }
 
-function renderCategoryPills() {
+function renderCategoryPills(cats) {
   var bar = document.getElementById('category-filter-bar');
-  if (!knownCategories || knownCategories.length === 0) { return; }
+  if (!cats || cats.length === 0) { bar.style.display = 'none'; return; }
 
+  // "All" is active only when no specific categories are selected
   var allActive = activeCategories.size === 0;
   var pills = '<button class="cat-pill' + (allActive ? ' active' : '') + '" onclick="filterByCategory(\'__all__\')">All</button>';
-  knownCategories.forEach(function(c) {
+  cats.forEach(function(c) {
     var isActive = activeCategories.has(c);
     pills += '<button class="cat-pill' + (isActive ? ' active' : '') + '" onclick="filterByCategory(' + JSON.stringify(c) + ')">' + escHtml(c) + '</button>';
   });
@@ -207,14 +206,21 @@ function renderCategoryPills() {
 // ── Multi-select category filter ────────────────────────────────────
 function filterByCategory(cat) {
   if (cat === '__all__') {
+    // Clicking All always clears all selections
     activeCategories.clear();
   } else if (activeCategories.has(cat)) {
+    // Clicking an active category removes it
     activeCategories.delete(cat);
   } else {
+    // Clicking an inactive category adds it
     activeCategories.add(cat);
   }
 
-  renderCategoryPills();   // instant — no server round-trip
+  fetch('jokes.php?action=categories')
+    .then(function(r) { return r.json(); })
+    .then(renderCategoryPills)
+    .catch(function() {});
+
   loadJokes(document.getElementById('search-input').value.trim());
 }
 
