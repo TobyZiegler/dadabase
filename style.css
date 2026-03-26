@@ -254,6 +254,8 @@ body.archive-open #browse {
 /* ─── Search Row ────────────────────────────────────────────────────── */
 .search-row {
   display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 0.75rem;
   margin-bottom: 2.5rem;
@@ -261,8 +263,9 @@ body.archive-open #browse {
 
 .search-wrapper {
   position: relative;
-  flex: 1;
+  flex: 1 1 auto;
   min-width: 0;
+  overflow: hidden;
 }
 
 .search-wrapper svg {
@@ -272,10 +275,13 @@ body.archive-open #browse {
   transform: translateY(-50%);
   color: var(--text-muted);
   pointer-events: none;
+  z-index: 1;
 }
 
 #search-input {
+  display: block;
   width: 100%;
+  box-sizing: border-box;
   font-family: var(--font-body);
   font-size: var(--text-base);
   color: var(--text);
@@ -296,7 +302,7 @@ body.archive-open #browse {
 }
 
 .btn-search {
-  flex-shrink: 0;
+  flex: 0 0 auto;
   white-space: nowrap;
 }
 

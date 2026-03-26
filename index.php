@@ -68,8 +68,8 @@
     </div>
   </div>
 
-  <div class="search-row">
-    <div class="search-wrapper">
+  <div class="search-row" style="display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;">
+    <div class="search-wrapper" style="flex:1 1 auto!important;min-width:0!important;max-width:calc(100% - 9rem)!important;overflow:hidden!important;">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
         <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
       </svg>
@@ -79,9 +79,10 @@
         placeholder="Search setups and punchlines&hellip;"
         autocomplete="off"
         oninput="handleSearch()"
+        style="display:block!important;width:100%!important;box-sizing:border-box!important;"
       >
     </div>
-    <button class="btn btn-secondary btn-search" onclick="triggerSearch()">Search</button>
+    <button class="btn btn-secondary btn-search" onclick="triggerSearch()" style="flex:0 0 auto!important;">Search</button>
   </div>
 
   <!-- Category filter pills — populated dynamically -->
