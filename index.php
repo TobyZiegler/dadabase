@@ -118,6 +118,7 @@ let searchTimer     = null;
 let archiveLoaded   = false;
 let archiveVisible  = false;
 let activeCategories = new Set(); // empty = All
+let knownCategories  = [];        // cached after first load
 
 // ── Single source of truth for archive show/hide state ──────────────
 function setArchiveState(show) {
@@ -185,18 +186,18 @@ async function loadCategories() {
   try {
     var res  = await fetch('jokes.php?action=categories');
     var cats = await res.json();
-    renderCategoryPills(cats);
+    knownCategories = cats;
+    renderCategoryPills();
   } catch (e) { /* silently skip if endpoint not ready */ }
 }
 
-function renderCategoryPills(cats) {
+function renderCategoryPills() {
   var bar = document.getElementById('category-filter-bar');
-  if (!cats || cats.length === 0) { bar.style.display = 'none'; return; }
+  if (!knownCategories || knownCategories.length === 0) { return; }
 
-  // "All" is active only when no specific categories are selected
   var allActive = activeCategories.size === 0;
   var pills = '<button class="cat-pill' + (allActive ? ' active' : '') + '" onclick="filterByCategory(\'__all__\')">All</button>';
-  cats.forEach(function(c) {
+  knownCategories.forEach(function(c) {
     var isActive = activeCategories.has(c);
     pills += '<button class="cat-pill' + (isActive ? ' active' : '') + '" onclick="filterByCategory(' + JSON.stringify(c) + ')">' + escHtml(c) + '</button>';
   });
@@ -206,21 +207,14 @@ function renderCategoryPills(cats) {
 // ── Multi-select category filter ────────────────────────────────────
 function filterByCategory(cat) {
   if (cat === '__all__') {
-    // Clicking All always clears all selections
     activeCategories.clear();
   } else if (activeCategories.has(cat)) {
-    // Clicking an active category removes it
     activeCategories.delete(cat);
   } else {
-    // Clicking an inactive category adds it
     activeCategories.add(cat);
   }
 
-  fetch('jokes.php?action=categories')
-    .then(function(r) { return r.json(); })
-    .then(renderCategoryPills)
-    .catch(function() {});
-
+  renderCategoryPills();
   loadJokes(document.getElementById('search-input').value.trim());
 }
 
