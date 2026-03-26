@@ -2,135 +2,16 @@
  * style.css — Dad-a-Base
  * dadabase.tobyziegler.com
  *
- * Depends on shared.css being loaded first in <head>:
- *   <link rel="stylesheet" href="shared.css">
- *   <link rel="stylesheet" href="style.css">
+ * Depends on shared.css loaded first. shared.css provides:
+ *   tokens, reset, body, noise overlay, h1–h3 + em/strong,
+ *   .site-name, .tagline, .burg/.green/.muted color helpers,
+ *   .site-header/.site-footer and their children,
+ *   .btn system, .eyebrow pattern, keyframes.
  *
- * Reset, base body styles, noise overlay, keyframes, .btn system,
- * and .eyebrow pattern all live in shared.css.
- *
- * Variable migration map (old → new):
- *   --cream       → --white-soft   (#FAF7F2)
- *   --warm-white  → --white-soft   (#FAF7F2 — close enough; --warm-white
- *                                   was #FFFEF9, 3 values off pure white;
- *                                   the difference was imperceptible)
- *   --espresso    → --text         (#2C1F14 — Dad-a-Base used #0F0804,
- *                                   slightly darker; new value is warmer
- *                                   and matches the Study palette exactly)
- *   --brown       → --text-muted   (#6B5744 — was #2E1F12; this is
- *                                   deliberately lighter and more readable)
- *   --taupe       → --text-muted   (#6B5744 — was #5C4D3C; consolidated)
- *   --accent      → --burg         (#7B2D3A — was #942E18 terracotta-red;
- *                                   new value is the burgundy from the Study)
- *   --accent-2    → --green        (#3A5C3B — was #1E4D44 teal-green;
- *                                   unified to Study green)
- *   --sand        → --rule         (rgba(44,31,20,0.15) — was #C8BAA8;
- *                                   rule variable is more semantic)
- *   --gold        → removed        (was #6B4F0A; used only for ha-vote
- *                                   hover states — replaced with --green)
- *   --font-display already matched (now inherits Lora from shared.css)
- *   --font-body   already matched
- *
- * NOTE ON COLOR SHIFT: The Dad-a-Base accent color changes from
- * terracotta (#942E18) to burgundy (#7B2D3A). This affects the hero
- * eyebrow, section title em, and vote button hover states. The
- * terracotta was a distinct identity for the Dad-a-Base that is being
- * intentionally traded for cross-site coherence. If you want to restore
- * a terracotta accent unique to the Dad-a-Base, add:
- *   :root { --burg: #942E18; }
- * at the top of this file (it will locally override shared.css).
+ * This file covers only Dad-a-Base page layout and components:
+ *   hero, joke spotlight, browse section, search, category pills,
+ *   joke grid/cards, vote buttons, submit form, admin panel, toast.
  */
-
-
-/* ─── Site Header ───────────────────────────────────────────────────── */
-.site-header {
-  padding: 1.5rem 3rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: rgba(245, 240, 232, 0.88);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--rule);
-}
-
-.logo {
-  display: flex;
-  align-items: baseline;
-  gap: 0.6rem;
-  text-decoration: none;
-}
-
-.logo-text {
-  font-family: var(--font-display);
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: var(--text);
-  letter-spacing: -0.02em;
-}
-
-.logo-badge {
-  font-family: var(--font-body);
-  font-size: var(--text-xs);
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--burg);
-  background: rgba(123, 45, 58, 0.1);
-  padding: 2px 8px;
-  border-radius: var(--radius-pill);
-}
-
-.header-nav {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.nav-link {
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  font-weight: 500;
-  color: var(--text-muted);
-  text-decoration: none;
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius-pill);
-  transition: all var(--transition);
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: inherit;
-}
-
-.nav-link:hover {
-  color: var(--text);
-  background: var(--rule);
-}
-
-/* The "Submit a Joke →" nav button uses .btn.btn-primary sizing with
-   slightly compact padding to sit in the header comfortably */
-.btn-nav {
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  font-weight: 500;
-  color: var(--white-soft);
-  background: var(--text);
-  text-decoration: none;
-  padding: 0.55rem 1.25rem;
-  border-radius: var(--radius-pill);
-  transition: all var(--transition);
-  display: inline-flex;
-  align-items: center;
-}
-
-.btn-nav:hover {
-  background: var(--burg);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-card);
-}
 
 
 /* ─── Hero ──────────────────────────────────────────────────────────── */
@@ -165,19 +46,10 @@
   background: var(--burg);
 }
 
+/* h1 em color: shared.css makes em italic; .burg on the em sets color */
+/* In HTML: <h1>A <em class="burg">serious</em> collection…</h1>       */
 .hero h1 {
-  font-size: clamp(3rem, 5vw, 4.5rem);
-  font-weight: 300;
-  color: var(--text);
-  letter-spacing: -0.03em;
   margin-bottom: 1.5rem;
-  font-family: var(--font-display);
-}
-
-.hero h1 em {
-  font-style: italic;
-  font-weight: 400;
-  color: var(--burg);
 }
 
 .hero-desc {
@@ -300,19 +172,9 @@
   transition: all var(--transition);
 }
 
-.vote-btn-sm:hover {
-  background: var(--rule);
-}
-
-.vote-btn-sm.ha:hover {
-  border-color: var(--green);
-  color: var(--text);
-}
-
-.vote-btn-sm.groan:hover {
-  border-color: var(--burg);
-  color: var(--burg);
-}
+.vote-btn-sm:hover          { background: var(--rule); }
+.vote-btn-sm.ha:hover       { border-color: var(--green); color: var(--text); }
+.vote-btn-sm.groan:hover    { border-color: var(--burg); color: var(--burg); }
 
 .next-joke {
   font-size: var(--text-sm);
@@ -333,9 +195,7 @@
 
 
 /* ─── Divider ───────────────────────────────────────────────────────── */
-.divider {
-  padding: 0 3rem;
-}
+.divider { padding: 0 3rem; }
 
 .divider hr {
   border: none;
@@ -367,40 +227,27 @@
   flex-shrink: 0;
 }
 
-/* "Ready when you are." — full cursive display, same weight as old h2 */
-.section-title-cursive {
-  font-family: var(--font-display);
-  font-size: clamp(1.8rem, 3vw, 2.4rem);
-  font-weight: 400;
-  font-style: italic;
-  letter-spacing: -0.01em;
-  color: var(--text);
-  margin-bottom: 0.4rem;
-}
+/* h2.italic in shared.css handles "Ready when you are." — no local rule needed */
 
 .section-subtitle {
   font-size: var(--text-base);
   color: var(--text-muted);
   font-weight: 400;
-}
-
-.section-title {
-  font-family: var(--font-display);
-  font-size: clamp(1.8rem, 3vw, 2.4rem);
-  font-weight: 300;
-  letter-spacing: -0.02em;
-  color: var(--text);
-}
-
-.section-title em {
-  font-style: italic;
-  color: var(--burg);
+  margin-top: 0.3rem;
 }
 
 .section-count {
   font-size: var(--text-sm);
   color: var(--text-muted);
   font-weight: 400;
+  min-height: 1.2em;
+  text-align: right;
+  display: block;
+}
+
+/* Padding so last joke card doesn't hide behind the fixed footer */
+body.archive-open #browse {
+  padding-bottom: 5rem;
 }
 
 
@@ -412,20 +259,10 @@
   margin-bottom: 2.5rem;
 }
 
-.search-row .search-wrapper {
-  flex: 1;
-  margin-bottom: 0;   /* override standalone margin */
-}
-
-.btn-search {
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-
-
-/* ─── Search Bar ────────────────────────────────────────────────────── */
 .search-wrapper {
   position: relative;
+  flex: 1;
+  min-width: 0;
 }
 
 .search-wrapper svg {
@@ -451,13 +288,16 @@
   box-shadow: var(--shadow-card);
 }
 
-#search-input::placeholder {
-  color: var(--text-muted);
-}
+#search-input::placeholder { color: var(--text-muted); }
 
 #search-input:focus {
   border-color: var(--text);
   box-shadow: 0 0 0 4px rgba(44, 31, 20, 0.06), var(--shadow-card);
+}
+
+.btn-search {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 
@@ -523,10 +363,7 @@
   gap: 0.5rem;
 }
 
-.vote-group {
-  display: flex;
-  gap: 0.375rem;
-}
+.vote-group   { display: flex; gap: 0.375rem; }
 
 .vote-btn {
   font-family: var(--font-body);
@@ -544,33 +381,12 @@
   gap: 0.3rem;
 }
 
-.vote-btn:hover {
-  box-shadow: var(--shadow-card);
-}
-
-.vote-btn.ha:hover {
-  background: rgba(58, 92, 59, 0.08);
-  border-color: var(--green);
-}
-
-.vote-btn.groan:hover {
-  background: rgba(123, 45, 58, 0.06);
-  border-color: var(--burg);
-}
-
-.vote-btn.voted { font-weight: 500; }
-
-.vote-btn.voted.ha {
-  background: rgba(58, 92, 59, 0.1);
-  border-color: var(--green);
-  color: var(--text);
-}
-
-.vote-btn.voted.groan {
-  background: rgba(123, 45, 58, 0.08);
-  border-color: var(--burg);
-  color: var(--burg);
-}
+.vote-btn:hover              { box-shadow: var(--shadow-card); }
+.vote-btn.ha:hover           { background: rgba(58, 92, 59, 0.08); border-color: var(--green); }
+.vote-btn.groan:hover        { background: rgba(123, 45, 58, 0.06); border-color: var(--burg); }
+.vote-btn.voted              { font-weight: 500; }
+.vote-btn.voted.ha           { background: rgba(58, 92, 59, 0.1); border-color: var(--green); color: var(--text); }
+.vote-btn.voted.groan        { background: rgba(123, 45, 58, 0.08); border-color: var(--burg); color: var(--burg); }
 
 .joke-by {
   font-size: var(--text-sm);
@@ -604,11 +420,21 @@
   white-space: nowrap;
 }
 
-.cat-pill:hover,
+.cat-pill:hover {
+  border-color: var(--text);
+  background: rgba(44, 31, 20, 0.08);
+  color: var(--text);
+}
+
 .cat-pill.active {
   border-color: var(--text);
   background: var(--text);
   color: var(--white-soft);
+}
+
+.cat-pill.active:hover {
+  background: var(--text-muted);
+  border-color: var(--text-muted);
 }
 
 .joke-cat-badge {
@@ -648,14 +474,7 @@
   margin: 0 auto 1rem;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.empty-state .empty-icon {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-}
+.empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 1rem; }
 
 .empty-state h3 {
   font-family: var(--font-display);
@@ -665,9 +484,7 @@
   margin-bottom: 0.5rem;
 }
 
-.empty-state p {
-  font-size: var(--text-base);
-}
+.empty-state p { font-size: var(--text-base); }
 
 
 /* ─── Submit Page ───────────────────────────────────────────────────── */
@@ -697,10 +514,7 @@
   margin-bottom: 0.5rem;
 }
 
-.submit-title em {
-  font-style: italic;
-  color: var(--burg);
-}
+.submit-title em { font-style: italic; color: var(--burg); }
 
 .submit-subtitle {
   font-size: var(--text-base);
@@ -709,9 +523,7 @@
   margin-bottom: 2rem;
 }
 
-.field {
-  margin-bottom: 1.25rem;
-}
+.field { margin-bottom: 1.25rem; }
 
 .field label {
   display: block;
@@ -739,9 +551,7 @@
 }
 
 .field input:focus,
-.field textarea:focus {
-  border-color: var(--green);
-}
+.field textarea:focus  { border-color: var(--green); }
 
 .field-hint {
   font-size: var(--text-sm);
@@ -756,15 +566,8 @@
   margin-top: 0.3rem;
 }
 
-.submit-success {
-  text-align: center;
-  padding: 1.25rem 0;
-}
-
-.submit-success-icon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-}
+.submit-success        { text-align: center; padding: 1.25rem 0; }
+.submit-success-icon   { font-size: 3rem; margin-bottom: 1rem; }
 
 .submit-success h2 {
   font-family: var(--font-display);
@@ -778,71 +581,6 @@
   font-size: var(--text-base);
   color: var(--text-muted);
   margin-bottom: 1.5rem;
-}
-
-
-/* ─── Site Footer ───────────────────────────────────────────────────── */
-.site-footer {
-  padding: 2rem 3rem;
-  border-top: 1px solid var(--rule);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-  transition: padding 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-              background 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Fixed footer — applied via JS when jokes grid is visible */
-.site-footer.footer-sticky {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 90;   /* below header (100) but above joke cards */
-  padding: 0.7rem 3rem;
-  background: rgba(245, 240, 232, 0.92);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  box-shadow: 0 -4px 20px rgba(44, 31, 20, 0.10);
-}
-
-/* Prevent the last joke card from hiding under the fixed footer */
-body.archive-open #browse {
-  padding-bottom: 5rem;
-}
-
-.footer-brand {
-  font-family: var(--font-display);
-  font-size: var(--text-body);
-  font-weight: 500;
-  color: var(--text);
-}
-
-.footer-tagline {
-  font-size: var(--text-sm);
-  color: var(--text-muted);
-  margin-top: 0.2rem;
-}
-
-.footer-right {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-  flex-wrap: wrap;
-}
-
-.footer-link {
-  font-size: var(--text-sm);
-  color: var(--text-muted);
-  text-decoration: none;
-  transition: color var(--transition);
-}
-
-.footer-link:hover {
-  color: var(--text);
 }
 
 
@@ -872,10 +610,7 @@ body.archive-open #browse {
 
 
 /* ─── Admin Panel ───────────────────────────────────────────────────── */
-.admin-page {
-  min-height: 100vh;
-  background: var(--bg);
-}
+.admin-page { min-height: 100vh; background: var(--bg); }
 
 .admin-header {
   background: var(--bg-dark);
@@ -889,11 +624,8 @@ body.archive-open #browse {
   z-index: 100;
 }
 
-.admin-title {
-  font-family: var(--font-display);
-  font-size: var(--text-body);
-  font-weight: 500;
-}
+/* .site-name on dark background needs a color override */
+.admin-header .site-name { color: var(--white-soft); }
 
 .admin-nav a {
   font-size: var(--text-sm);
@@ -903,9 +635,7 @@ body.archive-open #browse {
   transition: color var(--transition);
 }
 
-.admin-nav a:hover {
-  color: var(--white-soft);
-}
+.admin-nav a:hover { color: var(--white-soft); }
 
 .admin-main {
   max-width: 62.5rem;
@@ -955,13 +685,8 @@ body.archive-open #browse {
   vertical-align: top;
 }
 
-.admin-table tr:last-child td {
-  border-bottom: none;
-}
-
-.admin-table tr:hover td {
-  background: var(--bg);
-}
+.admin-table tr:last-child td   { border-bottom: none; }
+.admin-table tr:hover td        { background: var(--bg); }
 
 .badge {
   display: inline-block;
@@ -971,20 +696,10 @@ body.archive-open #browse {
   font-weight: 500;
 }
 
-.badge-pending {
-  background: rgba(212, 168, 83, 0.15);
-  color: #8B6914;
-}
+.badge-pending  { background: rgba(212, 168, 83, 0.15); color: #8B6914; }
+.badge-approved { background: rgba(58, 92, 59, 0.12); color: var(--green); }
 
-.badge-approved {
-  background: rgba(58, 92, 59, 0.12);
-  color: var(--green);
-}
-
-.admin-action-group {
-  display: flex;
-  gap: 0.375rem;
-}
+.admin-action-group { display: flex; gap: 0.375rem; }
 
 .btn-admin-approve,
 .btn-admin-delete {
@@ -998,31 +713,12 @@ body.archive-open #browse {
   transition: all var(--transition);
 }
 
-.btn-admin-approve {
-  background: rgba(58, 92, 59, 0.12);
-  color: var(--green);
-}
+.btn-admin-approve           { background: rgba(58, 92, 59, 0.12); color: var(--green); }
+.btn-admin-approve:hover     { background: var(--green); color: var(--white-soft); }
+.btn-admin-delete            { background: rgba(123, 45, 58, 0.08); color: var(--burg); }
+.btn-admin-delete:hover      { background: var(--burg); color: var(--white-soft); }
 
-.btn-admin-approve:hover {
-  background: var(--green);
-  color: var(--white-soft);
-}
-
-.btn-admin-delete {
-  background: rgba(123, 45, 58, 0.08);
-  color: var(--burg);
-}
-
-.btn-admin-delete:hover {
-  background: var(--burg);
-  color: var(--white-soft);
-}
-
-.stats-row {
-  display: flex;
-  gap: 3px;
-  margin-bottom: 4px;
-}
+.stats-row   { display: flex; gap: 3px; margin-bottom: 4px; }
 
 .stat-pill {
   font-size: var(--text-xs);
@@ -1031,15 +727,8 @@ body.archive-open #browse {
   font-weight: 400;
 }
 
-.stat-ha {
-  background: rgba(212, 168, 83, 0.12);
-  color: #8B6914;
-}
-
-.stat-groan {
-  background: rgba(123, 45, 58, 0.08);
-  color: var(--burg);
-}
+.stat-ha    { background: rgba(212, 168, 83, 0.12); color: #8B6914; }
+.stat-groan { background: rgba(123, 45, 58, 0.08); color: var(--burg); }
 
 
 /* ─── Admin Login ───────────────────────────────────────────────────── */
@@ -1075,14 +764,17 @@ body.archive-open #browse {
   margin-bottom: 2.25rem;
 }
 
-.login-card .field {
-  text-align: left;
-}
+.login-card .field { text-align: left; }
 
 
 /* ─── Responsive ────────────────────────────────────────────────────── */
 @media (max-width: 900px) {
-  .site-header { padding: 1.25rem 1.5rem; }
+  .site-header          { padding: 1.25rem 1.5rem; }
+  .site-footer          { padding: 2rem 1.5rem; }
+  .site-footer.footer-sticky { padding: 0.7rem 1.5rem; }
+  .admin-header         { padding: 1.25rem 1.5rem; }
+  .submit-card          { padding: 2.25rem 1.75rem; }
+  .divider              { padding: 0 1.5rem; }
 
   .hero {
     grid-template-columns: 1fr;
@@ -1091,36 +783,19 @@ body.archive-open #browse {
   }
 
   .section { padding: 3rem 1.5rem; }
-
-  .divider { padding: 0 1.5rem; }
-
-  .site-footer { padding: 2rem 1.5rem; }
-  .site-footer.footer-sticky { padding: 0.7rem 1.5rem; }
-
-  .admin-header { padding: 1.25rem 1.5rem; }
-
-  .submit-card { padding: 2.25rem 1.75rem; }
 }
 
 @media (max-width: 700px) {
-  .section-header { flex-direction: column; align-items: flex-start; }
+  .section-header       { flex-direction: column; align-items: flex-start; }
   .section-header-right { align-items: flex-start; width: 100%; }
 
-  .search-row { flex-wrap: wrap; }
-  .btn-search { width: 100%; justify-content: center; }
+  .search-row           { flex-wrap: wrap; }
+  .btn-search           { width: 100%; justify-content: center; }
 }
 
 @media (max-width: 600px) {
   .header-nav .nav-link { display: none; }
-
-  #jokes-grid { grid-template-columns: 1fr; }
-
-  .section-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .joke-card { padding: 1.5rem; }
-
-  .submit-card { padding: 1.75rem 1.25rem; }
+  #jokes-grid           { grid-template-columns: 1fr; }
+  .joke-card            { padding: 1.5rem; }
+  .submit-card          { padding: 1.75rem 1.25rem; }
 }

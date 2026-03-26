@@ -7,8 +7,25 @@
  * When this file changes, update the version comment below and
  * redeploy all copies before pushing page-level changes.
  *
- * Version: 1.0 — 2026-03-24
+ * Version: 2.0 — 2026-03-26
+ *
+ * What lives here:
+ *   — CSS custom properties (all tokens)
+ *   — Reset
+ *   — Base body (background, font, noise overlay)
+ *   — Typographic element selectors: h1–h3, p, em, strong
+ *   — Semantic utility classes: .site-name, .tagline, .burg, .green, .muted
+ *   — Site chrome: .site-header, .site-footer and their children
+ *   — Button system: .btn, .btn-primary, .btn-secondary
+ *   — Eyebrow label pattern
+ *   — Keyframe animations
+ *
+ * What does NOT live here:
+ *   — Page layout (hero, sections, grids)
+ *   — Component styles (cards, forms, search, pills)
+ *   — Page-specific overrides
  */
+
 
 /* ─── Google Fonts ──────────────────────────────────────────────────── */
 @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..500&display=swap');
@@ -47,7 +64,7 @@
   --font-display: 'Lora', Georgia, serif;
   --font-body:    'DM Sans', sans-serif;
 
-  /* Type scale — use these instead of raw rem values */
+  /* Type scale */
   --text-xs:    1.0rem;   /* fine print, footnotes */
   --text-sm:    1.1rem;   /* eyebrows, labels, small UI */
   --text-base:  1.3rem;   /* UI copy, captions, nav */
@@ -62,7 +79,7 @@
   --radius-sm:   0.4rem;
   --radius:      1.0rem;
   --radius-lg:   1.75rem;
-  --radius-pill: 1.25rem;   /* pill buttons */
+  --radius-pill: 1.25rem;
 
   /* Motion */
   --transition:  0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -84,7 +101,7 @@ html {
 }
 
 
-/* ─── Base ──────────────────────────────────────────────────────────── */
+/* ─── Base Body ─────────────────────────────────────────────────────── */
 body {
   background-color: var(--bg);
   background-image: url('assets/ParchmentPattern01.png');
@@ -102,7 +119,7 @@ body {
  * page's location. All rooms currently keep assets/ at the same level
  * as their index file, so 'assets/ParchmentPattern01.png' works for
  * all of them. If a room moves its assets folder, override body
- * background-image locally in that page's <style> block.
+ * background-image locally in that room's stylesheet.
  */
 
 
@@ -112,62 +129,306 @@ body::before {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 0;   /* below page content; fixed so it tiles without scrolling */
+  z-index: 0;
   opacity: 0.04;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   background-size: 200px 200px;
 }
 
 
-/* ─── Keyframes ─────────────────────────────────────────────────────── */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(1.2rem); }
-  to   { opacity: 1; transform: translateY(0); }
+/* ─── Typographic Element Selectors ─────────────────────────────────── */
+/*
+ * These set the typographic foundation for all rooms.
+ * A page's local stylesheet may override a specific instance where
+ * genuinely needed — but these are the defaults everything starts from.
+ *
+ * h1  page title, one per page, large display
+ * h2  section heading, readable display size
+ * h3  card or sub-section heading
+ * p   body copy
+ * em  italic emphasis; inherits color from parent or .burg/.green
+ * strong  bold emphasis
+ *
+ * To color just the em within a heading:
+ *   <h2>The <em class="burg">full</em> archive.</h2>
+ * To make an entire heading italic (e.g. "Ready when you are."):
+ *   <h2><em>Ready when you are.</em></h2>
+ *   or wrap the whole heading: <h2 style="font-style:italic">…</h2>
+ *   or add a local modifier class in the page stylesheet.
+ */
+
+h1 {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 5vw, 4.5rem);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  line-height: 1.15;
+  margin-bottom: 1.5rem;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+h1 em {
+  font-style: italic;
+  font-weight: 400;
+  /* color inherits from .burg/.green on parent, or stays --text */
 }
 
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(1.2em); }
-  to   { opacity: 1; transform: translateY(0); }
+h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  line-height: 1.25;
 }
 
-@keyframes scaleIn {
-  from { transform: scaleX(0); }
-  to   { transform: scaleX(1); }
+h2 em {
+  font-style: italic;
+  font-weight: 400;
 }
 
-@keyframes scrollPulse {
-  0%, 100% { opacity: 1; transform: scaleY(1); }
-  50%       { opacity: 0.3; transform: scaleY(0.6); }
+/* h2 used as a display-italic heading (e.g. "Ready when you are.") */
+h2.italic {
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
 }
 
-@keyframes expandDown {
-  from { opacity: 0; transform: translateY(-0.75rem); }
-  to   { opacity: 1; transform: translateY(0); }
+h3 {
+  font-family: var(--font-display);
+  font-size: var(--text-body);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  line-height: 1.3;
 }
 
-@keyframes cardIn {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
+h3 em {
+  font-style: italic;
+  font-weight: 400;
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.4; }
+p {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  color: var(--text);
+  line-height: 1.7;
+}
+
+strong {
+  font-weight: 600;
+}
+
+em {
+  font-style: italic;
+}
+
+
+/* ─── Color Helpers ─────────────────────────────────────────────────── */
+/*
+ * Apply to any element to set its color.
+ * Works on headings, spans, and em/strong children by inheritance.
+ *
+ *   <h2>The <em class="burg">full</em> archive.</h2>
+ *   <p class="muted">Supporting copy.</p>
+ */
+.burg  { color: var(--burg); }
+.green { color: var(--green); }
+.muted { color: var(--text-muted); }
+
+
+/* ─── Semantic Utility: .site-name and .tagline ─────────────────────── */
+/*
+ * .site-name — the name of the room/site wherever it appears:
+ *   header logo, footer, admin panel, any page title treatment.
+ *   Lora bold. Not a heading level — it's a proper noun.
+ *   Apply directly to an <a>, <span>, or <div>.
+ *
+ * .tagline — one supporting line: beneath a .site-name, beneath a
+ *   section heading, or anywhere a quiet secondary note is needed.
+ *   Replaces .footer-tagline and any other one-off muted-small-text classes.
+ */
+.site-name {
+  font-family: var(--font-display);
+  font-size: var(--text-body);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  text-decoration: none;
+  display: inline-block;
+}
+
+.tagline {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 400;
+  color: var(--text-muted);
+  line-height: 1.4;
+  display: block;
+  margin-top: 0.2rem;
+}
+
+
+/* ─── Site Header ───────────────────────────────────────────────────── */
+/*
+ * Sticky translucent bar at the top. Same structure on every room.
+ *
+ * HTML pattern:
+ *   <header class="site-header">
+ *     <a href="index.php" class="logo">
+ *       <span class="site-name">Dad-a-Base</span>
+ *       <span class="logo-badge">Est. 2025</span>   ← optional
+ *     </a>
+ *     <nav class="header-nav">
+ *       <button class="nav-link">…</button>
+ *       <a class="btn-nav">…</a>                    ← optional CTA
+ *     </nav>
+ *   </header>
+ */
+.site-header {
+  padding: 1.5rem 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(245, 240, 232, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--rule);
+}
+
+.logo {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  text-decoration: none;
+}
+
+.logo-badge {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--burg);
+  background: rgba(123, 45, 58, 0.1);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nav-link {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 500;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-pill);
+  transition: all var(--transition);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.nav-link:hover {
+  color: var(--text);
+  background: var(--rule);
+}
+
+.btn-nav {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 500;
+  color: var(--white-soft);
+  background: var(--text);
+  text-decoration: none;
+  padding: 0.55rem 1.25rem;
+  border-radius: var(--radius-pill);
+  transition: all var(--transition);
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.btn-nav:hover {
+  background: var(--burg);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-card);
+}
+
+
+/* ─── Site Footer ───────────────────────────────────────────────────── */
+/*
+ * Same structure on every room:
+ *
+ *   <footer class="site-footer">
+ *     <div>
+ *       <span class="site-name">Dad-a-Base</span>
+ *       <span class="tagline">Here whether you like it or not.</span>
+ *     </div>
+ *     <nav class="footer-nav">
+ *       <a href="…" class="footer-link">Submit a Joke</a>
+ *     </nav>
+ *   </footer>
+ *
+ * .footer-sticky is applied via JS when a scrollable content layer
+ * is visible and the footer links should stay accessible.
+ */
+.site-footer {
+  padding: 2rem 3rem;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  transition: padding 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              background 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.site-footer.footer-sticky {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 90;
+  padding: 0.7rem 3rem;
+  background: rgba(245, 240, 232, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 -4px 20px rgba(44, 31, 20, 0.10);
+}
+
+.footer-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.footer-link {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+
+.footer-link:hover {
+  color: var(--text);
 }
 
 
 /* ─── Button System ─────────────────────────────────────────────────── */
-/*
- * All pill buttons share these fundamentals. The display/size of the
- * base .btn class is set here; .btn-primary and .btn-secondary add color.
- * Each page may add page-specific button variants (e.g. .btn-assess)
- * in their local <style> block — using these tokens for consistency.
- */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -220,7 +481,6 @@ body::before {
   transform: translateX(4px);
 }
 
-/* Focus ring — keyboard nav */
 .btn:focus-visible,
 .btn-primary:focus-visible,
 .btn-secondary:focus-visible {
@@ -231,19 +491,12 @@ body::before {
 
 /* ─── Eyebrow Label Pattern ─────────────────────────────────────────── */
 /*
- * The line + small-caps text pattern that labels sections throughout
- * the ecosystem. Color of the line and text varies per section but
- * the structure is always the same.
- *
  * Usage:
  *   <div class="eyebrow">
  *     <span class="eyebrow-line"></span>
  *     <span class="eyebrow-text">The Work</span>
  *   </div>
- *
- * Override color on the parent element or with a modifier class:
- *   .eyebrow--burg .eyebrow-line  { background: var(--burg); }
- *   .eyebrow--burg .eyebrow-text  { color: var(--burg); }
+ * Color variant: add class eyebrow--burg for burgundy line + text.
  */
 .eyebrow {
   display: flex;
@@ -267,6 +520,51 @@ body::before {
   color: var(--green);
 }
 
-/* Burgundy variant */
 .eyebrow--burg .eyebrow-line { background: var(--burg); }
 .eyebrow--burg .eyebrow-text { color: var(--burg); }
+
+
+/* ─── Keyframes ─────────────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(1.2rem); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(1.2em); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+@keyframes scrollPulse {
+  0%, 100% { opacity: 1; transform: scaleY(1); }
+  50%       { opacity: 0.3; transform: scaleY(0.6); }
+}
+
+@keyframes expandDown {
+  from { opacity: 0; transform: translateY(-0.75rem); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

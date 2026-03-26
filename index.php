@@ -12,7 +12,7 @@
 <!-- ─── Header ─────────────────────────────────────────────────────── -->
 <header class="site-header">
   <a href="index.php" class="logo">
-    <span class="logo-text">Dad-a-Base</span>
+    <span class="site-name">Dad-a-Base</span>
     <span class="logo-badge">Est. 2025</span>
   </a>
   <nav class="header-nav">
@@ -25,7 +25,7 @@
 <section class="hero">
   <div class="hero-content">
     <div class="hero-eyebrow">The Finest in Groan-Worthy Humor</div>
-    <h1>A <em>serious</em> collection of dad jokes.</h1>
+    <h1>A <em class="burg">serious</em> collection of dad jokes.</h1>
     <p class="hero-desc">
       Every pun. Every eye-roll. Every sigh that slowly becomes a smile.
       All in one place, curated with exactly as much care as they deserve.
@@ -59,7 +59,7 @@
 <section class="section" id="browse">
   <div class="section-header">
     <div>
-      <h2 class="section-title-cursive">Ready when you are.</h2>
+      <h2 class="italic">Ready when you are.</h2>
       <p class="section-subtitle">Browse the full archive or search below to find a specific joke.</p>
     </div>
     <div class="section-header-right">
@@ -97,15 +97,15 @@
 <!-- ─── Footer ─────────────────────────────────────────────────────── -->
 <footer class="site-footer">
   <div>
-    <div class="footer-brand">Dad-a-Base</div>
-    <div class="footer-tagline">Here whether you like it or not.</div>
+    <span class="site-name">Dad-a-Base</span>
+    <span class="tagline">Here whether you like it or not.</span>
   </div>
-  <div class="footer-right">
+  <nav class="footer-nav">
     <a href="submit.php" class="footer-link">Submit a Joke</a>
     <a href="about.php" class="footer-link">How This Was Built</a>
     <a href="admin.php" class="footer-link">Admin</a>
     <a href="https://tobyziegler.com" class="footer-link" target="_blank">TobyZiegler.com</a>
-  </div>
+  </nav>
 </footer>
 
 <!-- ─── Toast ──────────────────────────────────────────────────────── -->
