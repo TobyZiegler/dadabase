@@ -361,8 +361,9 @@
 
 .section-header-right {
   display: flex;
-  align-items: center;
-  gap: 1rem;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
   flex-shrink: 0;
 }
 
@@ -794,16 +795,23 @@
               box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Sticky compact footer — applied via JS when jokes grid is visible */
+/* Fixed footer — applied via JS when jokes grid is visible */
 .site-footer.footer-sticky {
-  position: sticky;
+  position: fixed;
   bottom: 0;
+  left: 0;
+  right: 0;
   z-index: 90;   /* below header (100) but above joke cards */
   padding: 0.7rem 3rem;
   background: rgba(245, 240, 232, 0.92);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   box-shadow: 0 -4px 20px rgba(44, 31, 20, 0.10);
+}
+
+/* Prevent the last joke card from hiding under the fixed footer */
+body.archive-open #browse {
+  padding-bottom: 5rem;
 }
 
 .footer-brand {
@@ -1092,9 +1100,14 @@
   .admin-header { padding: 1.25rem 1.5rem; }
 
   .submit-card { padding: 2.25rem 1.75rem; }
+}
 
+@media (max-width: 700px) {
   .section-header { flex-direction: column; align-items: flex-start; }
-  .section-header-right { width: 100%; justify-content: space-between; }
+  .section-header-right { align-items: flex-start; width: 100%; }
+
+  .search-row { flex-wrap: wrap; }
+  .btn-search { width: 100%; justify-content: center; }
 }
 
 @media (max-width: 600px) {

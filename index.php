@@ -16,7 +16,7 @@
     <span class="logo-badge">Est. 2025</span>
   </a>
   <nav class="header-nav">
-    <button onclick="revealArchive()" class="nav-link" style="background:none;border:none;cursor:pointer;font-size:inherit;">Show Them All</button>
+    <button onclick="revealArchive()" id="nav-show-all-btn" class="nav-link" style="background:none;border:none;cursor:pointer;font-size:inherit;">Show Them All</button>
     <a href="submit.php" class="btn-nav">Submit a Joke →</a>
   </nav>
 </header>
@@ -113,63 +113,69 @@
 
 <!-- ─── JS ────────────────────────────────────────────────────────── -->
 <script>
-let heroJokeId    = null;
-let searchTimer   = null;
-let archiveLoaded = false;
-let activeCategory = ''; // '' = All
+let heroJokeId      = null;
+let searchTimer     = null;
+let archiveLoaded   = false;
+let archiveVisible  = false;
+let activeCategories = new Set(); // empty = All
 
-// ── Footer sticky state ─────────────────────────────────────────────
-function setFooterSticky(sticky) {
-  var footer = document.querySelector('.site-footer');
-  if (footer) footer.classList.toggle('footer-sticky', sticky);
-}
+// ── Single source of truth for archive show/hide state ──────────────
+function setArchiveState(show) {
+  var prompt  = document.getElementById('archive-prompt');
+  var grid    = document.getElementById('jokes-grid');
+  var catBar  = document.getElementById('category-filter-bar');
+  var showBtn = document.getElementById('show-all-btn');
+  var navBtn  = document.getElementById('nav-show-all-btn');
+  var footer  = document.querySelector('.site-footer');
 
-// ── Reveal / toggle archive ─────────────────────────────────────────
-function revealArchive() {
-  var prompt = document.getElementById('archive-prompt');
-  var grid   = document.getElementById('jokes-grid');
-  var catBar = document.getElementById('category-filter-bar');
-  var btn    = document.getElementById('show-all-btn');
+  archiveVisible = show;
 
-  if (!archiveLoaded) {
+  if (show) {
     prompt.style.display = 'none';
     grid.style.display   = 'grid';
     catBar.style.display = 'flex';
-    archiveLoaded = true;
-    loadCategories();
-    loadJokes();
-    if (btn) btn.textContent = 'Hide the jokes';
-    setFooterSticky(true);
-  } else if (grid.style.display === 'none') {
-    prompt.style.display = 'none';
-    grid.style.display   = 'grid';
-    catBar.style.display = 'flex';
-    if (btn) btn.textContent = 'Hide the jokes';
-    setFooterSticky(true);
+    if (showBtn) showBtn.textContent = 'Hide the jokes';
+    if (navBtn)  navBtn.textContent  = 'Hide Them All';
+    if (footer)  footer.classList.add('footer-sticky');
+    document.body.classList.add('archive-open');
   } else {
     grid.style.display   = 'none';
     catBar.style.display = 'none';
     prompt.style.display = 'block';
-    if (btn) btn.textContent = 'Show all the jokes';
-    setFooterSticky(false);
+    if (showBtn) showBtn.textContent = 'Show all the jokes';
+    if (navBtn)  navBtn.textContent  = 'Show Them All';
+    if (footer)  footer.classList.remove('footer-sticky');
+    document.body.classList.remove('archive-open');
   }
+}
 
+// ── Reveal / toggle archive ─────────────────────────────────────────
+function revealArchive() {
+  if (!archiveLoaded) {
+    archiveLoaded = true;
+    setArchiveState(true);
+    loadCategories();
+    loadJokes();
+  } else {
+    setArchiveState(!archiveVisible);
+  }
   document.getElementById('browse').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ── Ensure archive is open (called by search/category interactions) ──
+function ensureArchiveOpen() {
+  if (!archiveVisible) {
+    if (!archiveLoaded) {
+      archiveLoaded = true;
+      loadCategories();
+    }
+    setArchiveState(true);
+  }
 }
 
 // ── Search button trigger ───────────────────────────────────────────
 function triggerSearch() {
-  var prompt = document.getElementById('archive-prompt');
-  var grid   = document.getElementById('jokes-grid');
-  var catBar = document.getElementById('category-filter-bar');
-  if (prompt.style.display !== 'none') {
-    prompt.style.display = 'none';
-    grid.style.display   = 'grid';
-    catBar.style.display = 'flex';
-    archiveLoaded = true;
-    loadCategories();
-    setFooterSticky(true);
-  }
+  ensureArchiveOpen();
   var q = document.getElementById('search-input').value.trim();
   loadJokes(q);
 }
@@ -187,24 +193,34 @@ function renderCategoryPills(cats) {
   var bar = document.getElementById('category-filter-bar');
   if (!cats || cats.length === 0) { bar.style.display = 'none'; return; }
 
-  var pills = '<button class="cat-pill' + (activeCategory === '' ? ' active' : '') + '" onclick="filterByCategory(\'\')">All</button>';
+  // "All" is active only when no specific categories are selected
+  var allActive = activeCategories.size === 0;
+  var pills = '<button class="cat-pill' + (allActive ? ' active' : '') + '" onclick="filterByCategory(\'__all__\')">All</button>';
   cats.forEach(function(c) {
-    pills += '<button class="cat-pill' + (activeCategory === c ? ' active' : '') + '" onclick="filterByCategory(' + JSON.stringify(c) + ')">' + escHtml(c) + '</button>';
+    var isActive = activeCategories.has(c);
+    pills += '<button class="cat-pill' + (isActive ? ' active' : '') + '" onclick="filterByCategory(' + JSON.stringify(c) + ')">' + escHtml(c) + '</button>';
   });
   bar.innerHTML = pills;
 }
 
+// ── Multi-select category filter ────────────────────────────────────
 function filterByCategory(cat) {
-  // Clicking the active category (including All='') deselects it back to All
-  if (cat !== '' && cat === activeCategory) {
-    activeCategory = '';
+  if (cat === '__all__') {
+    // Clicking All always clears all selections
+    activeCategories.clear();
+  } else if (activeCategories.has(cat)) {
+    // Clicking an active category removes it
+    activeCategories.delete(cat);
   } else {
-    activeCategory = cat;
+    // Clicking an inactive category adds it
+    activeCategories.add(cat);
   }
+
   fetch('jokes.php?action=categories')
     .then(function(r) { return r.json(); })
     .then(renderCategoryPills)
     .catch(function() {});
+
   loadJokes(document.getElementById('search-input').value.trim());
 }
 
@@ -214,18 +230,54 @@ async function loadJokes(query) {
   grid.innerHTML = '<div class="loading-state"><div class="loading-spinner"></div><p>Fetching jokes\u2026</p></div>';
 
   var url;
+  var cats = Array.from(activeCategories);
+
   if (query && query.length > 0) {
     url = 'jokes.php?action=search&q=' + encodeURIComponent(query);
-    if (activeCategory) url += '&category=' + encodeURIComponent(activeCategory);
-  } else if (activeCategory) {
-    url = 'jokes.php?action=by_category&category=' + encodeURIComponent(activeCategory);
-  } else {
+    if (cats.length === 1) url += '&category=' + encodeURIComponent(cats[0]);
+    // multi-category search: fetch all matching categories client-side
+    // (single-category search uses the existing endpoint; multi uses union below)
+  } else if (cats.length === 1) {
+    url = 'jokes.php?action=by_category&category=' + encodeURIComponent(cats[0]);
+  } else if (cats.length === 0) {
     url = 'jokes.php?action=all';
+  } else {
+    // Multi-category: fetch each category then union the results
+    fetchMultiCategory(cats, query);
+    return;
   }
 
   try {
     var res   = await fetch(url);
     var jokes = await res.json();
+    renderJokes(jokes);
+  } catch (e) {
+    grid.innerHTML = '<div class="empty-state"><div class="empty-icon">\uD83D\uDE05</div><h3>Something went wrong</h3><p>Try refreshing the page.</p></div>';
+  }
+}
+
+// ── Multi-category union fetch ──────────────────────────────────────
+async function fetchMultiCategory(cats, query) {
+  var grid = document.getElementById('jokes-grid');
+  try {
+    var fetches = cats.map(function(c) {
+      var url = 'jokes.php?action=by_category&category=' + encodeURIComponent(c);
+      if (query && query.length > 0) {
+        url = 'jokes.php?action=search&q=' + encodeURIComponent(query) + '&category=' + encodeURIComponent(c);
+      }
+      return fetch(url).then(function(r) { return r.json(); });
+    });
+    var results = await Promise.all(fetches);
+    // Union by joke id, preserving order
+    var seen = new Set();
+    var jokes = [];
+    results.forEach(function(arr) {
+      arr.forEach(function(j) {
+        if (!seen.has(j.id)) { seen.add(j.id); jokes.push(j); }
+      });
+    });
+    // Sort by id for stable order
+    jokes.sort(function(a, b) { return a.id - b.id; });
     renderJokes(jokes);
   } catch (e) {
     grid.innerHTML = '<div class="empty-state"><div class="empty-icon">\uD83D\uDE05</div><h3>Something went wrong</h3><p>Try refreshing the page.</p></div>';
@@ -244,7 +296,6 @@ function renderJokes(jokes) {
   }
 
   grid.innerHTML = jokes.map(function(j, i) {
-    // categories is an array supplied by jokes.php (decoded from JSON column)
     var cats = Array.isArray(j.categories) ? j.categories : [];
     var catBadges = cats.map(function(c) {
       return '<span class="joke-cat-badge">' + escHtml(c) + '</span>';
@@ -334,19 +385,9 @@ async function vote(jokeId, voteType, btnEl) {
   }
 }
 
-// ── Search ──────────────────────────────────────────────────────────
+// ── Search (live, on input) ─────────────────────────────────────────
 function handleSearch() {
-  var prompt = document.getElementById('archive-prompt');
-  var grid   = document.getElementById('jokes-grid');
-  var catBar = document.getElementById('category-filter-bar');
-  if (prompt.style.display !== 'none') {
-    prompt.style.display = 'none';
-    grid.style.display   = 'grid';
-    catBar.style.display = 'flex';
-    archiveLoaded = true;
-    loadCategories();
-    setFooterSticky(true);
-  }
+  ensureArchiveOpen();
   clearTimeout(searchTimer);
   searchTimer = setTimeout(function() {
     var q = document.getElementById('search-input').value.trim();
