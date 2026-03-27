@@ -29,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Submit a Joke — Dad-a-Base</title>
+  <link rel="stylesheet" href="shared.css">
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="submit-page">
@@ -36,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!-- ─── Header ─────────────────────────────────────────────────────── -->
 <header class="site-header">
   <a href="index.php" class="logo">
-    <span class="logo-text">Dad-a-Base</span>
+    <span class="room-name">Dad-a-Base</span>
     <span class="logo-badge">Est. 2025</span>
   </a>
   <nav class="header-nav">
@@ -138,14 +139,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <footer class="site-footer">
   <div>
-    <div class="footer-brand">Dad-a-Base</div>
-    <div class="footer-tagline">Here whether you like it or not.</div>
+    <span class="room-name">Dad-a-Base</span>
+    <span class="tagline">Here whether you like it or not.</span>
   </div>
-  <div class="footer-right">
+  <nav class="footer-nav">
     <a href="index.php" class="footer-link">Browse Jokes</a>
     <a href="about.php" class="footer-link">How This Was Built</a>
     <a href="https://tobyziegler.com" class="footer-link" target="_blank">TobyZiegler.com</a>
-  </div>
+  </nav>
 </footer>
 
 </body>

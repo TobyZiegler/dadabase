@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>How This Was Built — Dad-a-Base</title>
   <meta name="description" content="The origin story, design philosophy, and methodology behind the Dad-a-Base — built through AI-assisted engineering without writing a single line of code by hand.">
+  <link rel="stylesheet" href="shared.css">
   <link rel="stylesheet" href="style.css">
   <style>
     .about-main {
@@ -259,7 +260,7 @@
 <!-- ─── Header ─────────────────────────────────────────────────────── -->
 <header class="site-header">
   <a href="index.php" class="logo">
-    <span class="logo-text">Dad-a-Base</span>
+    <span class="room-name">Dad-a-Base</span>
     <span class="logo-badge">Est. 2025</span>
   </a>
   <nav class="header-nav">
@@ -445,15 +446,15 @@
 <!-- ─── Footer ─────────────────────────────────────────────────────── -->
 <footer class="site-footer">
   <div>
-    <div class="footer-brand">Dad-a-Base</div>
-    <div class="footer-tagline">Here whether you like it or not.</div>
+    <span class="room-name">Dad-a-Base</span>
+    <span class="tagline">Here whether you like it or not.</span>
   </div>
-  <div class="footer-right">
+  <nav class="footer-nav">
     <a href="submit.php" class="footer-link">Submit a Joke</a>
     <a href="about.php" class="footer-link">How This Was Built</a>
     <a href="admin.php" class="footer-link">Admin</a>
     <a href="https://tobyziegler.com" class="footer-link" target="_blank">TobyZiegler.com</a>
-  </div>
+  </nav>
 </footer>
 
 </body>

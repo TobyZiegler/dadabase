@@ -68,6 +68,7 @@ if ($authed && isset($_GET['format'])) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Download Jokes — Dad-a-Base</title>
+  <link rel="stylesheet" href="shared.css">
   <link rel="stylesheet" href="style.css">
   <style>
     .download-card {

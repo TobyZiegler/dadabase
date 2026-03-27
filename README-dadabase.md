@@ -19,9 +19,9 @@ It is, in other words, the most dad thing imaginable: built with love, slightly 
 ## Features
 
 - 🎲 **Joke of the Moment** — A random joke spotlighted on the homepage with a theatrical reveal mechanic
-- 📂 **Browse Archive** — The full joke database, revealed on demand; toggle open and closed
+- 📂 **Browse Archive** — The full joke database, revealed on demand; toggles open and closed with button label updating to match; footer sticks to the bottom of the viewport while the archive is open so links remain accessible
 - 🔍 **Live Search** — Instant keyword search across setups and punchlines; triggers the archive automatically if searched before browsing
-- 🏷️ **Category Filter** — Pill-button filter bar lets visitors browse by AI-assigned category; filter and search work together
+- 🏷️ **Category Filter** — Multi-select pill-button filter bar; categories are additive (selecting Animals then Technology shows jokes from both); clicking an active category deselects it; All clears all filters; filter and search work together
 - ➕ **Submit a Joke** — Visitor submissions enter a moderation queue; success screen auto-focuses "Submit Another" for fast follow-up submissions
 - 😄 **Vote** — Ha! or Groan on every joke; one vote per IP address per joke
 - 🔒 **Admin Panel** — Secure moderation interface for approving, editing, deleting, and categorizing jokes; database-backed bcrypt auth
@@ -33,9 +33,11 @@ It is, in other words, the most dad thing imaginable: built with love, slightly 
 
 ## Design Philosophy
 
-The Dad-a-Base uses a **warm editorial minimalism** aesthetic. The palette runs from cream and sand through espresso and terracotta — organic materials rather than interface colors. Typography pairs Fraunces (a characterful variable serif with beautiful italics) with DM Sans for body text. Space is generous, motion is restrained, and the single moment of theater — the punchline reveal — earns its drama because everything around it is calm.
+The Dad-a-Base uses a **warm editorial minimalism** aesthetic. The palette runs from cream and parchment through espresso and burgundy — organic materials rather than interface colors. Typography pairs Lora (a brush-influenced serif with expressive italics) with DM Sans for body text. Space is generous, motion is restrained, and the single moment of theater — the punchline reveal — earns its drama because everything around it is calm.
 
 Accessibility was a priority throughout: contrast ratios are strong across the palette, mobile type sizes are scaled up generously for comfortable reading, and form inputs are sized to prevent iOS auto-zoom.
+
+The Dad-a-Base shares a design system with tobyziegler.com and its other subdomains. A common `shared.css` defines tokens, typography, site chrome, and the button system — ensuring the same authorial hand is legible across every room.
 
 ---
 
@@ -50,7 +52,7 @@ Accessibility was a priority throughout: contrast ratios are strong across the p
 | Hosting | Namecheap Shared Hosting (cPanel) |
 | Deployment | Git Version Control via cPanel |
 | Version Control | Git / GitHub |
-| Fonts | Google Fonts (Fraunces, DM Sans) |
+| Fonts | Google Fonts (Lora, DM Sans) |
 
 No frameworks. No npm. No build step. Just files on a server.
 
@@ -70,8 +72,8 @@ dadabase.tobyziegler.com/
 ├── bulk_download.php     # Admin tool — export jokes as CSV or JSON
 ├── categorize.php        # Server-side Claude API endpoint for AI category assignment
 ├── db.php                # Database connection + all credentials (never committed)
-├── shared.css            # Full site stylesheet
-├── style.css             # dadabase site stylesheet
+├── shared.css            # Cross-site design system — tokens, typography, site chrome, buttons (shared with all tobyziegler.com rooms)
+├── style.css             # Dad-a-Base page layout and components — hero, cards, search, pills, admin
 └── setup.sql             # Database schema + seed data (run once, never deployed)
 ```
 
@@ -249,15 +251,19 @@ The troubleshooting process was itself instructive: subdomain document root misc
 
 - [x] Joke categories with AI assignment
 - [x] Multi-category support — each joke can belong to as many categories as apply
-- [x] Category filter on public archive
+- [x] Category filter on public archive — multi-select, additive, works with search
 - [x] Bulk upload (CSV and JSON)
 - [x] Bulk download (CSV and JSON)
 - [x] Database-backed admin authentication with bcrypt
+- [x] Shared design system with tobyziegler.com (shared.css)
+- [x] Sticky footer when archive is open
+- [ ] Daily joke post for social media (one per day, different per platform)
 - [ ] Pagination for large joke counts
 - [ ] Top-rated jokes leaderboard
 - [ ] Social sharing buttons
 - [ ] Joke of the Day feature
 - [ ] Daily email subscription
+- [ ] Dark mode
 
 ---
 
