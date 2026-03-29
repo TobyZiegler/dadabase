@@ -113,12 +113,13 @@
 
 <!-- ─── JS ────────────────────────────────────────────────────────── -->
 <script>
-let heroJokeId      = null;
-let searchTimer     = null;
-let archiveLoaded   = false;
-let archiveVisible  = false;
-let activeCategories = new Set(); // empty = All
-let knownCategories  = [];        // cached after first load
+var heroJokeId      = null;
+var searchTimer     = null;
+var archiveLoaded   = false;
+var archiveVisible  = false;
+var activeCategories = new Set(); // empty = All active; null = none active (All toggled off)
+var allActive        = true;      // true = All pill is on; false = All pill is off (show nothing)
+var knownCategories  = [];        // cached after first load
 
 // ── Single source of truth for archive show/hide state ──────────────
 function setArchiveState(show) {
@@ -183,6 +184,7 @@ function triggerSearch() {
 
 // ── Load category pills ─────────────────────────────────────────────
 async function loadCategories() {
+  if (knownCategories.length > 0) { return; } // already loaded, don't clobber active state
   try {
     var res  = await fetch('jokes.php?action=categories');
     var cats = await res.json();
@@ -195,8 +197,7 @@ function renderCategoryPills() {
   var bar = document.getElementById('category-filter-bar');
   if (!knownCategories || knownCategories.length === 0) { return; }
 
-  var allActive = activeCategories.size === 0;
-  var pills = '<button class="cat-pill' + (allActive ? ' active' : '') + '" onclick="filterByCategory(\'__all__\')">All</button>';
+  var pills = '<button class="cat-pill' + (allActive ? ' active' : '') + '" onclick="filterByCategory(\'__all__\')" title="' + (allActive ? 'Click to show no jokes' : 'Click to show all jokes') + '">All</button>';
   knownCategories.forEach(function(c) {
     var isActive = activeCategories.has(c);
     pills += '<button class="cat-pill' + (isActive ? ' active' : '') + '" onclick="filterByCategory(' + JSON.stringify(c) + ')">' + escHtml(c) + '</button>';
@@ -207,11 +208,26 @@ function renderCategoryPills() {
 // ── Multi-select category filter ────────────────────────────────────
 function filterByCategory(cat) {
   if (cat === '__all__') {
-    activeCategories.clear();
-  } else if (activeCategories.has(cat)) {
-    activeCategories.delete(cat);
+    // Toggle All: if currently all-active, turn everything off; if off or category-filtered, turn all on
+    if (allActive) {
+      allActive = false;
+      activeCategories.clear();
+    } else {
+      allActive = true;
+      activeCategories.clear();
+    }
   } else {
-    activeCategories.add(cat);
+    // Clicking a specific category always exits All mode
+    allActive = false;
+    if (activeCategories.has(cat)) {
+      activeCategories.delete(cat);
+      // If we just removed the last active category, go back to All
+      if (activeCategories.size === 0) {
+        allActive = true;
+      }
+    } else {
+      activeCategories.add(cat);
+    }
   }
 
   renderCategoryPills();
@@ -221,6 +237,13 @@ function filterByCategory(cat) {
 // ── Fetch jokes from jokes.php ──────────────────────────────────────
 async function loadJokes(query) {
   var grid = document.getElementById('jokes-grid');
+
+  // All toggled off — show nothing
+  if (!allActive && activeCategories.size === 0) {
+    renderJokes([]);
+    return;
+  }
+
   grid.innerHTML = '<div class="loading-state"><div class="loading-spinner"></div><p>Fetching jokes\u2026</p></div>';
 
   var url;
