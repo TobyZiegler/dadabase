@@ -378,27 +378,21 @@ body.archive-open #browse {
   color: var(--text-muted);
   font-style: italic;
   line-height: 1.5;
+  font-weight: 400;
+  display: none;
   padding-top: 0.75rem;
   border-top: 1px solid var(--rule);
   margin-top: 0.25rem;
-  font-weight: 400;
-  opacity: 0;
-  visibility: hidden;
-  height: 0;
-  overflow: hidden;
-  padding-top: 0;
-  border-top-width: 0;
-  margin-top: 0;
-  transition: opacity 0.35s ease, visibility 0.35s ease;
 }
 
 .joke-punchline.revealed {
-  opacity: 1;
-  visibility: visible;
-  height: auto;
-  padding-top: 0.75rem;
-  border-top-width: 1px;
-  margin-top: 0.25rem;
+  display: block;
+  animation: punchlineIn 0.3s ease both;
+}
+
+@keyframes punchlineIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .joke-footer {

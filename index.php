@@ -213,9 +213,16 @@ function renderCategoryPills() {
   var pills = '<button class="cat-pill' + (allActive ? ' active' : '') + '" onclick="filterByCategory(\'__all__\')">All</button>';
   knownCategories.forEach(function(c) {
     var isActive = activeCategories.has(c);
-    pills += '<button class="cat-pill' + (isActive ? ' active' : '') + '" onclick="filterByCategory(' + JSON.stringify(c) + ')">' + escHtml(c) + '</button>';
+    // Use a data attribute + delegated handler to avoid quote-in-attribute issues
+    pills += '<button class="cat-pill' + (isActive ? ' active' : '') + '" data-cat="' + escHtml(c) + '">' + escHtml(c) + '</button>';
   });
   bar.innerHTML = pills;
+  // Attach click handlers via JS — avoids all quoting issues with category names
+  bar.querySelectorAll('.cat-pill[data-cat]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      filterByCategory(btn.getAttribute('data-cat'));
+    });
+  });
 }
 
 // ── Category filter logic ────────────────────────────────────────────
