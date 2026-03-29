@@ -350,6 +350,29 @@ body.archive-open #browse {
   line-height: 1.4;
 }
 
+/* Per-card reveal button — mirrors hero reveal-btn style */
+.card-reveal-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--green);
+  background: rgba(58, 92, 59, 0.08);
+  border: none;
+  padding: 0.4rem 0.875rem;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all var(--transition);
+  margin-bottom: 0.75rem;
+}
+
+.card-reveal-btn:hover {
+  background: rgba(58, 92, 59, 0.15);
+  transform: translateY(-1px);
+}
+
 .joke-punchline {
   font-size: var(--text-base);
   color: var(--text-muted);
@@ -359,6 +382,15 @@ body.archive-open #browse {
   border-top: 1px solid var(--rule);
   margin-top: 0.25rem;
   font-weight: 400;
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: opacity 0.4s ease, max-height 0.4s ease;
+}
+
+.joke-punchline.revealed {
+  opacity: 1;
+  max-height: 20rem;
 }
 
 .joke-footer {

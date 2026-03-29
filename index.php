@@ -84,6 +84,14 @@
     <button class="btn btn-secondary btn-search" onclick="triggerSearch()">Search</button>
   </div>
 
+  <!-- Reveal-all toggle — hidden until archive is open -->
+  <div id="reveal-all-row" style="display:none;justify-content:flex-end;margin-bottom:1.25rem;margin-top:-0.5rem">
+    <button id="reveal-all-btn" class="btn btn-secondary" onclick="toggleAllPunchlines()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:0.3rem"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      Reveal all punchlines
+    </button>
+  </div>
+
   <!-- Category filter pills — populated dynamically -->
   <div id="category-filter-bar" style="display:none;flex-wrap:wrap;gap:8px;margin-bottom:28px"></div>
 
@@ -113,37 +121,41 @@
 
 <!-- ─── JS ────────────────────────────────────────────────────────── -->
 <script>
-var heroJokeId       = null;
-var searchTimer      = null;
-var archiveLoaded    = false;
-var archiveVisible   = false;
-var activeCategories = new Set(); // which specific categories are selected
-var allActive        = true;      // true = All pill on (show everything); false = All pill off
-var knownCategories  = [];        // cached after first fetch — never re-fetched to avoid clobbering pill state
+var heroJokeId           = null;
+var searchTimer          = null;
+var archiveLoaded        = false;
+var archiveVisible       = false;
+var activeCategories     = new Set(); // which specific categories are selected
+var allActive            = true;      // true = All pill on (show everything); false = All pill off
+var knownCategories      = [];        // cached after first fetch — never re-fetched to avoid clobbering pill state
+var allPunchlinesRevealed = false;    // global reveal-all toggle state
 
 // ── Single source of truth for archive show/hide state ──────────────
 function setArchiveState(show) {
-  var prompt  = document.getElementById('archive-prompt');
-  var grid    = document.getElementById('jokes-grid');
-  var catBar  = document.getElementById('category-filter-bar');
-  var showBtn = document.getElementById('show-all-btn');
-  var navBtn  = document.getElementById('nav-show-all-btn');
-  var footer  = document.querySelector('.site-footer');
+  var prompt       = document.getElementById('archive-prompt');
+  var grid         = document.getElementById('jokes-grid');
+  var catBar       = document.getElementById('category-filter-bar');
+  var showBtn      = document.getElementById('show-all-btn');
+  var navBtn       = document.getElementById('nav-show-all-btn');
+  var footer       = document.querySelector('.site-footer');
+  var revealAllRow = document.getElementById('reveal-all-row');
 
   archiveVisible = show;
 
   if (show) {
-    prompt.style.display = 'none';
-    grid.style.display   = 'grid';
-    catBar.style.display = 'flex';
+    prompt.style.display      = 'none';
+    grid.style.display        = 'grid';
+    catBar.style.display      = 'flex';
+    revealAllRow.style.display = 'flex';
     if (showBtn) showBtn.textContent = 'Hide the jokes';
     if (navBtn)  navBtn.textContent  = 'Hide Them All';
     if (footer)  footer.classList.add('footer-sticky');
     document.body.classList.add('archive-open');
   } else {
-    grid.style.display   = 'none';
-    catBar.style.display = 'none';
-    prompt.style.display = 'block';
+    grid.style.display        = 'none';
+    catBar.style.display      = 'none';
+    prompt.style.display      = 'block';
+    revealAllRow.style.display = 'none';
     if (showBtn) showBtn.textContent = 'Show all the jokes';
     if (navBtn)  navBtn.textContent  = 'Show Them All';
     if (footer)  footer.classList.remove('footer-sticky');
@@ -233,7 +245,40 @@ function filterByCategory(cat) {
   loadJokes(document.getElementById('search-input').value.trim());
 }
 
-// ── Fetch and render jokes ───────────────────────────────────────────
+// ── Global punchline reveal toggle ───────────────────────────────────
+function toggleAllPunchlines() {
+  allPunchlinesRevealed = !allPunchlinesRevealed;
+  var btn = document.getElementById('reveal-all-btn');
+
+  if (allPunchlinesRevealed) {
+    // Reveal all: show punchlines, hide per-card reveal buttons
+    document.querySelectorAll('.joke-punchline').forEach(function(el) {
+      el.classList.add('revealed');
+    });
+    document.querySelectorAll('.card-reveal-btn').forEach(function(el) {
+      el.style.display = 'none';
+    });
+    if (btn) btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:0.3rem"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>Hide all punchlines';
+  } else {
+    // Hide all: mask punchlines, restore per-card reveal buttons
+    document.querySelectorAll('.joke-punchline').forEach(function(el) {
+      el.classList.remove('revealed');
+    });
+    document.querySelectorAll('.card-reveal-btn').forEach(function(el) {
+      el.style.display = 'inline-flex';
+    });
+    if (btn) btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:0.3rem"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Reveal all punchlines';
+  }
+}
+
+// ── Per-card punchline reveal ─────────────────────────────────────────
+function revealCardPunchline(btn) {
+  var card = btn.closest('.joke-card');
+  card.querySelector('.joke-punchline').classList.add('revealed');
+  btn.style.display = 'none';
+}
+
+
 async function loadJokes(query) {
   var grid = document.getElementById('jokes-grid');
   var cats = Array.from(activeCategories);
@@ -313,6 +358,10 @@ function renderJokes(jokes) {
     return;
   }
 
+  // Punchline starts hidden unless global reveal is active
+  var punchlineClass  = allPunchlinesRevealed ? 'joke-punchline revealed' : 'joke-punchline';
+  var revealBtnDisplay = allPunchlinesRevealed ? 'display:none' : 'display:inline-flex';
+
   grid.innerHTML = jokes.map(function(j, i) {
     var cats = Array.isArray(j.categories) ? j.categories : [];
     var catBadges = cats.map(function(c) {
@@ -321,8 +370,12 @@ function renderJokes(jokes) {
 
     return '<article class="joke-card" style="animation-delay:' + Math.min(i * 0.05, 0.5) + 's">'
       + '<div class="joke-card-number">No. ' + String(j.id).padStart(3, '0') + catBadges + '</div>'
-      + '<div class="joke-setup">'     + escHtml(j.setup)     + '</div>'
-      + '<div class="joke-punchline">' + escHtml(j.punchline) + '</div>'
+      + '<div class="joke-setup">'     + escHtml(j.setup) + '</div>'
+      + '<button class="card-reveal-btn" onclick="revealCardPunchline(this)" style="' + revealBtnDisplay + '">'
+        + '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>'
+        + ' Reveal punchline'
+      + '</button>'
+      + '<div class="' + punchlineClass + '">' + escHtml(j.punchline) + '</div>'
       + '<div class="joke-footer">'
         + '<div class="vote-group">'
           + '<button class="vote-btn ha"    onclick="vote(' + j.id + ', \'ha\', this)">\uD83D\uDE04 Ha! <span class="vote-count">' + j.ha_count    + '</span></button>'
