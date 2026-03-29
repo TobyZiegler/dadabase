@@ -113,13 +113,13 @@
 
 <!-- ─── JS ────────────────────────────────────────────────────────── -->
 <script>
-var heroJokeId      = null;
-var searchTimer     = null;
-var archiveLoaded   = false;
-var archiveVisible  = false;
-var activeCategories = new Set(); // empty = All active; null = none active (All toggled off)
-var allActive        = true;      // true = All pill is on; false = All pill is off (show nothing)
-var knownCategories  = [];        // cached after first load
+var heroJokeId       = null;
+var searchTimer      = null;
+var archiveLoaded    = false;
+var archiveVisible   = false;
+var activeCategories = new Set(); // which specific categories are selected
+var allActive        = true;      // true = All pill on (show everything); false = All pill off
+var knownCategories  = [];        // cached after first fetch — never re-fetched to avoid clobbering pill state
 
 // ── Single source of truth for archive show/hide state ──────────────
 function setArchiveState(show) {
@@ -182,9 +182,9 @@ function triggerSearch() {
   loadJokes(q);
 }
 
-// ── Load category pills ─────────────────────────────────────────────
+// ── Load category pills — fetched once, never again ─────────────────
 async function loadCategories() {
-  if (knownCategories.length > 0) { return; } // already loaded, don't clobber active state
+  if (knownCategories.length > 0) { return; } // guard: don't re-fetch and clobber active state
   try {
     var res  = await fetch('jokes.php?action=categories');
     var cats = await res.json();
@@ -193,11 +193,12 @@ async function loadCategories() {
   } catch (e) { /* silently skip if endpoint not ready */ }
 }
 
+// ── Render pills from current allActive / activeCategories state ─────
 function renderCategoryPills() {
   var bar = document.getElementById('category-filter-bar');
   if (!knownCategories || knownCategories.length === 0) { return; }
 
-  var pills = '<button class="cat-pill' + (allActive ? ' active' : '') + '" onclick="filterByCategory(\'__all__\')" title="' + (allActive ? 'Click to show no jokes' : 'Click to show all jokes') + '">All</button>';
+  var pills = '<button class="cat-pill' + (allActive ? ' active' : '') + '" onclick="filterByCategory(\'__all__\')">All</button>';
   knownCategories.forEach(function(c) {
     var isActive = activeCategories.has(c);
     pills += '<button class="cat-pill' + (isActive ? ' active' : '') + '" onclick="filterByCategory(' + JSON.stringify(c) + ')">' + escHtml(c) + '</button>';
@@ -205,23 +206,21 @@ function renderCategoryPills() {
   bar.innerHTML = pills;
 }
 
-// ── Multi-select category filter ────────────────────────────────────
+// ── Category filter logic ────────────────────────────────────────────
+// All toggles on/off independently.
+// Clicking a specific category exits All mode and adds/removes that category.
+// Removing the last specific category returns to All-on.
 function filterByCategory(cat) {
   if (cat === '__all__') {
-    // Toggle All: if currently all-active, turn everything off; if off or category-filtered, turn all on
-    if (allActive) {
-      allActive = false;
-      activeCategories.clear();
-    } else {
-      allActive = true;
-      activeCategories.clear();
-    }
+    // Toggle All: on → off, or anything else → All on
+    allActive = !allActive;
+    activeCategories.clear();
   } else {
-    // Clicking a specific category always exits All mode
+    // Any specific category click turns All off
     allActive = false;
     if (activeCategories.has(cat)) {
       activeCategories.delete(cat);
-      // If we just removed the last active category, go back to All
+      // Removing last active category snaps back to All-on
       if (activeCategories.size === 0) {
         allActive = true;
       }
@@ -234,12 +233,13 @@ function filterByCategory(cat) {
   loadJokes(document.getElementById('search-input').value.trim());
 }
 
-// ── Fetch jokes from jokes.php ──────────────────────────────────────
+// ── Fetch and render jokes ───────────────────────────────────────────
 async function loadJokes(query) {
   var grid = document.getElementById('jokes-grid');
+  var cats = Array.from(activeCategories);
 
-  // All toggled off — show nothing
-  if (!allActive && activeCategories.size === 0) {
+  // All toggled off and no specific categories — show empty state immediately, no fetch
+  if (!allActive && cats.length === 0) {
     renderJokes([]);
     return;
   }
@@ -247,21 +247,23 @@ async function loadJokes(query) {
   grid.innerHTML = '<div class="loading-state"><div class="loading-spinner"></div><p>Fetching jokes\u2026</p></div>';
 
   var url;
-  var cats = Array.from(activeCategories);
 
   if (query && query.length > 0) {
     url = 'jokes.php?action=search&q=' + encodeURIComponent(query);
-    if (cats.length === 1) url += '&category=' + encodeURIComponent(cats[0]);
-    // multi-category search: fetch all matching categories client-side
-    // (single-category search uses the existing endpoint; multi uses union below)
+    if (cats.length === 1) {
+      url += '&category=' + encodeURIComponent(cats[0]);
+    } else if (cats.length > 1) {
+      fetchMultiCategory(cats, query);
+      return;
+    }
   } else if (cats.length === 1) {
     url = 'jokes.php?action=by_category&category=' + encodeURIComponent(cats[0]);
-  } else if (cats.length === 0) {
-    url = 'jokes.php?action=all';
-  } else {
-    // Multi-category: fetch each category then union the results
+  } else if (cats.length > 1) {
     fetchMultiCategory(cats, query);
     return;
+  } else {
+    // allActive and no specific cats = show everything
+    url = 'jokes.php?action=all';
   }
 
   try {
@@ -273,7 +275,7 @@ async function loadJokes(query) {
   }
 }
 
-// ── Multi-category union fetch ──────────────────────────────────────
+// ── Multi-category union fetch ───────────────────────────────────────
 async function fetchMultiCategory(cats, query) {
   var grid = document.getElementById('jokes-grid');
   try {
@@ -285,15 +287,14 @@ async function fetchMultiCategory(cats, query) {
       return fetch(url).then(function(r) { return r.json(); });
     });
     var results = await Promise.all(fetches);
-    // Union by joke id, preserving order
-    var seen = new Set();
+    // Union by joke id
+    var seen  = new Set();
     var jokes = [];
     results.forEach(function(arr) {
       arr.forEach(function(j) {
         if (!seen.has(j.id)) { seen.add(j.id); jokes.push(j); }
       });
     });
-    // Sort by id for stable order
     jokes.sort(function(a, b) { return a.id - b.id; });
     renderJokes(jokes);
   } catch (e) {
@@ -301,7 +302,7 @@ async function fetchMultiCategory(cats, query) {
   }
 }
 
-// ── Render joke cards ───────────────────────────────────────────────
+// ── Render joke cards ────────────────────────────────────────────────
 function renderJokes(jokes) {
   var grid  = document.getElementById('jokes-grid');
   var count = document.getElementById('joke-count');
@@ -333,7 +334,7 @@ function renderJokes(jokes) {
   }).join('');
 }
 
-// ── Hero random joke ────────────────────────────────────────────────
+// ── Hero random joke ─────────────────────────────────────────────────
 async function loadHeroJoke() {
   var setupEl     = document.getElementById('hero-setup');
   var punchlineEl = document.getElementById('hero-punchline');
@@ -375,7 +376,7 @@ async function heroVote(type) {
   loadHeroJoke();
 }
 
-// ── Vote handler ────────────────────────────────────────────────────
+// ── Vote handler ─────────────────────────────────────────────────────
 async function vote(jokeId, voteType, btnEl) {
   try {
     var res  = await fetch('vote.php', {
@@ -402,7 +403,7 @@ async function vote(jokeId, voteType, btnEl) {
   }
 }
 
-// ── Search (live, on input) ─────────────────────────────────────────
+// ── Search (live, on input) ──────────────────────────────────────────
 function handleSearch() {
   ensureArchiveOpen();
   clearTimeout(searchTimer);
@@ -412,7 +413,7 @@ function handleSearch() {
   }, 300);
 }
 
-// ── Toast ───────────────────────────────────────────────────────────
+// ── Toast ────────────────────────────────────────────────────────────
 function showToast(msg) {
   var t = document.getElementById('toast');
   t.textContent = msg;
@@ -420,14 +421,14 @@ function showToast(msg) {
   setTimeout(function() { t.classList.remove('show'); }, 3000);
 }
 
-// ── Escape HTML (DOM-based, bulletproof) ────────────────────────────
+// ── Escape HTML (DOM-based, bulletproof) ─────────────────────────────
 function escHtml(str) {
   var d = document.createElement('div');
   d.appendChild(document.createTextNode(String(str)));
   return d.innerHTML;
 }
 
-// ── Init ────────────────────────────────────────────────────────────
+// ── Init ─────────────────────────────────────────────────────────────
 loadHeroJoke();
 </script>
 
