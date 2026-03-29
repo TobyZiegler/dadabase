@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </nav>
 </header>
 
-<main class="submit-main">
+<main class="submit-wrap">
   <div class="submit-card">
 
     <div class="submit-eyebrow">Community Contribution</div>
@@ -145,6 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <nav class="footer-nav">
     <a href="index.php" class="footer-link">Browse Jokes</a>
     <a href="about.php" class="footer-link">How This Was Built</a>
+    <a href="admin.php" class="footer-link">Admin</a>
     <a href="https://tobyziegler.com" class="footer-link" target="_blank">TobyZiegler.com</a>
   </nav>
 </footer>

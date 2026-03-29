@@ -644,7 +644,7 @@ body.archive-open #browse {
 .admin-nav a:hover { color: var(--white-soft); }
 
 .admin-main {
-  max-width: 62.5rem;
+  max-width: 100rem;
   margin: 0 auto;
   padding: 2.5rem 1.5rem;
 }

@@ -8,75 +8,88 @@
   <link rel="stylesheet" href="shared.css">
   <link rel="stylesheet" href="style.css">
   <style>
+    /* ── Easy-change tokens for this page ──────────────────────────── */
+    :root {
+      --about-font-display: var(--font-display);   /* Lora — headings, blockquote */
+      --about-font-body:    var(--font-body);       /* DM Sans — all prose */
+      --about-text-base:    var(--text-base);       /* 1.3rem — UI copy, labels  */
+      --about-text-body:    var(--text-body);       /* 1.6rem — body paragraphs  */
+    }
+
     .about-main {
-      max-width: 720px;
+      max-width: 45rem;
       margin: 0 auto;
-      padding: 64px 48px 80px;
+      padding: 4rem 3rem 5rem;
+      font-family: var(--about-font-body);
     }
 
     .about-eyebrow {
-      font-size: 0.72rem;
+      font-family: var(--about-font-body);
+      font-size: var(--text-xs);
       font-weight: 500;
       letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 16px;
+      color: var(--burg);
+      margin-bottom: 1rem;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 0.625rem;
     }
 
     .about-eyebrow::before {
       content: '';
       display: block;
-      width: 24px;
+      width: 1.5rem;
       height: 1px;
-      background: var(--accent);
+      background: var(--burg);
     }
 
     .about-title {
-      font-family: var(--font-display);
+      font-family: var(--about-font-display);
       font-size: clamp(2.2rem, 4vw, 3.2rem);
       font-weight: 300;
       letter-spacing: -0.03em;
-      color: var(--espresso);
-      margin-bottom: 12px;
+      color: var(--text);
+      margin-bottom: 0.75rem;
       line-height: 1.15;
     }
 
     .about-title em {
       font-style: italic;
-      color: var(--accent);
+      color: var(--burg);
     }
 
     .about-subtitle {
-      font-size: 1.05rem;
-      color: var(--brown);
+      font-family: var(--about-font-body);
+      font-size: var(--about-text-base);
+      color: var(--text-muted);
       line-height: 1.75;
-      margin-bottom: 56px;
-      max-width: 580px;
+      margin-bottom: 3.5rem;
+      max-width: 36rem;
     }
 
     .about-section {
-      margin-bottom: 52px;
+      margin-bottom: 3.25rem;
     }
 
     .about-section-label {
-      font-size: 0.7rem;
+      font-family: var(--about-font-body);
+      font-size: var(--text-xs);
       font-weight: 600;
       letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: var(--taupe);
-      margin-bottom: 16px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--sand);
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+      padding-bottom: 0.625rem;
+      border-bottom: 1px solid var(--rule);
     }
 
     .about-section p {
-      font-size: 1rem;
-      color: var(--brown);
+      font-family: var(--about-font-body);
+      font-size: var(--about-text-base);
+      color: var(--text-muted);
       line-height: 1.8;
-      margin-bottom: 16px;
+      margin-bottom: 1rem;
     }
 
     .about-section p:last-child {
@@ -84,7 +97,7 @@
     }
 
     .about-section p strong {
-      color: var(--espresso);
+      color: var(--text);
       font-weight: 500;
     }
 
@@ -92,11 +105,12 @@
     .stack-table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 8px;
+      margin-top: 0.5rem;
+      font-family: var(--about-font-body);
     }
 
     .stack-table tr {
-      border-bottom: 1px solid var(--sand);
+      border-bottom: 1px solid var(--rule);
     }
 
     .stack-table tr:last-child {
@@ -104,29 +118,29 @@
     }
 
     .stack-table td {
-      padding: 12px 0;
-      font-size: 0.95rem;
+      padding: 0.75rem 0;
+      font-size: var(--about-text-base);
       vertical-align: top;
     }
 
     .stack-table td:first-child {
-      color: var(--taupe);
+      color: var(--text-muted);
       font-weight: 500;
-      width: 140px;
-      font-size: 0.85rem;
+      width: 9rem;
       letter-spacing: 0.02em;
-      padding-right: 24px;
+      padding-right: 1.5rem;
     }
 
     .stack-table td:last-child {
-      color: var(--espresso);
+      color: var(--text);
     }
 
     .stack-note {
-      font-size: 0.88rem;
-      color: var(--taupe);
+      font-family: var(--about-font-body);
+      font-size: var(--about-text-base);
+      color: var(--text-muted);
       font-style: italic;
-      margin-top: 16px;
+      margin-top: 1rem;
     }
 
     /* ── Feature list ── */
@@ -134,16 +148,17 @@
       list-style: none;
       padding: 0;
       margin: 0;
+      font-family: var(--about-font-body);
     }
 
     .feature-list li {
       display: flex;
-      gap: 16px;
+      gap: 1rem;
       align-items: baseline;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--sand);
-      font-size: 0.95rem;
-      color: var(--brown);
+      padding: 0.625rem 0;
+      border-bottom: 1px solid var(--rule);
+      font-size: var(--about-text-base);
+      color: var(--text-muted);
       line-height: 1.5;
     }
 
@@ -153,8 +168,8 @@
 
     .feature-list li .feat-name {
       font-weight: 500;
-      color: var(--espresso);
-      min-width: 160px;
+      color: var(--text);
+      min-width: 10rem;
       flex-shrink: 0;
     }
 
@@ -162,29 +177,30 @@
     .obstacle-list {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      margin-top: 8px;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
     }
 
     .obstacle-card {
-      background: var(--warm-white);
-      border: 1.5px solid var(--sand);
+      background: var(--white-soft);
+      border: 1.5px solid var(--rule);
       border-radius: var(--radius);
-      padding: 20px 24px;
+      padding: 1.25rem 1.5rem;
+      font-family: var(--about-font-body);
     }
 
     .obstacle-label {
-      font-size: 0.72rem;
+      font-size: var(--text-xs);
       font-weight: 600;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 6px;
+      color: var(--burg);
+      margin-bottom: 0.375rem;
     }
 
     .obstacle-desc {
-      font-size: 0.92rem;
-      color: var(--brown);
+      font-size: var(--about-text-base);
+      color: var(--text-muted);
       line-height: 1.65;
     }
 
@@ -195,17 +211,18 @@
       margin: 0;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 0.5rem;
+      font-family: var(--about-font-body);
     }
 
     .next-list li {
-      font-size: 0.95rem;
-      color: var(--brown);
-      padding: 8px 0;
-      border-bottom: 1px solid var(--sand);
+      font-size: var(--about-text-base);
+      color: var(--text-muted);
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--rule);
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 0.75rem;
     }
 
     .next-list li:last-child { border-bottom: none; }
@@ -213,45 +230,45 @@
     .next-list li::before {
       content: '';
       display: inline-block;
-      width: 8px;
-      height: 8px;
-      border: 1.5px solid var(--taupe);
+      width: 0.5rem;
+      height: 0.5rem;
+      border: 1.5px solid var(--text-muted);
       border-radius: 2px;
-      flex-shrink: 0;
     }
 
     /* ── Closing quote ── */
     .closing-quote {
-      margin-top: 56px;
-      padding: 32px 40px;
-      background: var(--warm-white);
+      margin-top: 3.5rem;
+      padding: 2rem 2.5rem;
+      background: var(--white-soft);
       border-radius: var(--radius-lg);
-      border-left: 3px solid var(--accent);
-      box-shadow: var(--shadow-sm);
+      border-left: 3px solid var(--burg);
+      box-shadow: var(--shadow-card);
     }
 
     .closing-quote blockquote {
-      font-family: var(--font-display);
-      font-size: 1.2rem;
+      font-family: var(--about-font-display);
+      font-size: var(--text-lg);
       font-weight: 400;
       font-style: italic;
-      color: var(--espresso);
+      color: var(--text);
       line-height: 1.6;
-      margin: 0 0 12px 0;
+      margin: 0 0 0.75rem 0;
     }
 
     .closing-quote cite {
-      font-size: 0.82rem;
-      color: var(--taupe);
+      font-family: var(--about-font-body);
+      font-size: var(--about-text-base);
+      color: var(--text-muted);
       font-style: normal;
     }
 
     @media (max-width: 600px) {
-      .about-main { padding: 40px 24px 60px; }
-      .feature-list li { flex-direction: column; gap: 4px; }
+      .about-main { padding: 2.5rem 1.5rem 3.75rem; }
+      .feature-list li { flex-direction: column; gap: 0.25rem; }
       .feature-list li .feat-name { min-width: unset; }
-      .stack-table td:first-child { width: 110px; }
-      .closing-quote { padding: 24px; }
+      .stack-table td:first-child { width: 6.875rem; }
+      .closing-quote { padding: 1.5rem; }
     }
   </style>
 </head>
@@ -314,9 +331,9 @@
     <div class="about-section-label">Design Philosophy</div>
     <p>
       The aesthetic direction is <strong>warm editorial minimalism.</strong> The palette runs
-      from cream and sand through espresso and terracotta &mdash; organic materials
-      rather than interface colors. Typography pairs Fraunces, a characterful variable
-      serif with beautiful italics, with DM Sans for body text.
+      from cream and sand through espresso and burgundy &mdash; organic materials
+      rather than interface colors. Typography pairs Lora, a brush-influenced serif
+      with expressive italics, with DM Sans for body text.
     </p>
     <p>
       Space is generous, motion is restrained, and the single moment of theater &mdash;
@@ -357,7 +374,7 @@
       <tr><td>Hosting</td><td>Namecheap Shared Hosting (cPanel)</td></tr>
       <tr><td>Deployment</td><td>Git Version Control via cPanel</td></tr>
       <tr><td>Source Control</td><td>Git &amp; GitHub</td></tr>
-      <tr><td>Fonts</td><td>Google Fonts &mdash; Fraunces, DM Sans</td></tr>
+      <tr><td>Fonts</td><td>Google Fonts &mdash; Lora, DM Sans</td></tr>
     </table>
     <p class="stack-note">No frameworks. No npm. No build step. Just files on a server, the way the web was built &mdash; and proud of it.</p>
   </div>

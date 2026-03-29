@@ -116,91 +116,136 @@ if ($authed) {
   <link rel="stylesheet" href="shared.css">
   <link rel="stylesheet" href="style.css">
   <style>
+    /* ── Admin-specific tokens ─────────────────────────────────────── */
+    :root {
+      --admin-font-display: var(--font-display);
+      --admin-font-body:    var(--font-body);
+      --admin-text-base:    var(--text-base);
+      --admin-text-sm:      var(--text-sm);
+      --admin-text-xs:      var(--text-xs);
+    }
+
+    /* ── Edit modal ────────────────────────────────────────────────── */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(15,8,4,0.6);
+      background: rgba(15, 8, 4, 0.6);
       backdrop-filter: blur(4px);
       z-index: 200;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 24px;
+      padding: 1.5rem;
     }
+
     .modal-card {
-      background: var(--warm-white);
+      background: var(--white-soft);
       border-radius: var(--radius-lg);
-      padding: 40px;
-      max-width: 520px;
+      padding: 2.5rem;
+      max-width: 32.5rem;
       width: 100%;
-      box-shadow: var(--shadow-lg);
+      box-shadow: var(--shadow-lift);
     }
+
     .modal-title {
-      font-family: var(--font-display);
-      font-size: 1.5rem;
+      font-family: var(--admin-font-display);
+      font-size: var(--text-lg);
       font-weight: 400;
-      color: var(--espresso);
-      margin-bottom: 6px;
+      color: var(--text);
+      margin-bottom: 0.375rem;
     }
+
     .modal-subtitle {
-      font-size: 0.85rem;
-      color: var(--taupe);
-      margin-bottom: 28px;
+      font-family: var(--admin-font-body);
+      font-size: var(--admin-text-sm);
+      color: var(--text-muted);
+      margin-bottom: 1.75rem;
     }
+
     .modal-actions {
       display: flex;
-      gap: 10px;
-      margin-top: 24px;
+      gap: 0.625rem;
+      margin-top: 1.5rem;
     }
+
+    /* ── Admin action buttons ──────────────────────────────────────── */
     .btn-admin-edit {
-      font-family: var(--font-body);
-      font-size: 0.78rem;
+      font-family: var(--admin-font-body);
+      font-size: var(--admin-text-xs);
       font-weight: 500;
       border: none;
-      padding: 6px 14px;
-      border-radius: 20px;
+      padding: 0.375rem 0.875rem;
+      border-radius: var(--radius-pill);
       cursor: pointer;
       transition: all var(--transition);
-      background: rgba(44,31,22,0.07);
-      color: var(--espresso);
+      background: rgba(44, 31, 20, 0.07);
+      color: var(--text);
       text-decoration: none;
       display: inline-block;
     }
+
     .btn-admin-edit:hover {
-      background: var(--espresso);
-      color: white;
+      background: var(--text);
+      color: var(--white-soft);
     }
+
     .btn-admin-categorize {
-      font-family: var(--font-body);
-      font-size: 0.78rem;
+      font-family: var(--admin-font-body);
+      font-size: var(--admin-text-xs);
       font-weight: 500;
       border: none;
-      padding: 6px 14px;
-      border-radius: 20px;
+      padding: 0.375rem 0.875rem;
+      border-radius: var(--radius-pill);
       cursor: pointer;
       transition: all var(--transition);
-      background: rgba(30, 77, 68, 0.10);
-      color: var(--accent-2);
+      background: rgba(58, 92, 59, 0.10);
+      color: var(--green);
     }
+
     .btn-admin-categorize:hover {
-      background: var(--accent-2);
-      color: white;
+      background: var(--green);
+      color: var(--white-soft);
     }
+
     .btn-admin-categorize:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
-    /* Mini category badges inside admin table cells */
+
+    /* ── Mini category badges inside table cells ───────────────────── */
     .cat-badge-mini {
       display: inline-block;
-      font-size: 0.7rem;
-      padding: 2px 7px;
-      border-radius: 10px;
-      background: rgba(44,31,22,0.07);
-      color: var(--brown);
+      font-family: var(--admin-font-body);
+      font-size: var(--admin-text-xs);
+      padding: 1px 0.4375rem;
+      border-radius: var(--radius-pill);
+      background: rgba(44, 31, 20, 0.07);
+      color: var(--text-muted);
       margin: 1px 2px 1px 0;
       white-space: nowrap;
     }
+    /* ── Sortable column headers ───────────────────────────────────── */
+    .admin-table th.sortable {
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .admin-table th.sortable:hover {
+      color: var(--text);
+      background: var(--bg-alt);
+    }
+
+    .admin-table th.sortable::after {
+      content: ' \2195';   /* ↕ unsorted indicator */
+      opacity: 0.3;
+      font-size: 0.85em;
+    }
+
+    .admin-table th.sort-asc::after  { content: ' \2191'; opacity: 0.8; } /* ↑ */
+    .admin-table th.sort-desc::after { content: ' \2193'; opacity: 0.8; } /* ↓ */
+    .admin-table th.sort-asc,
+    .admin-table th.sort-desc        { color: var(--text); }
   </style>
 </head>
 <body>
@@ -231,7 +276,7 @@ if ($authed) {
     </form>
 
     <div style="margin-top:24px">
-      <a href="index.php" style="font-size:0.82rem;color:var(--taupe);text-decoration:none">← Back to Dad-a-Base</a>
+      <a href="index.php" style="font-size:var(--text-xs);color:var(--text-muted);text-decoration:none">← Back to Dad-a-Base</a>
     </div>
   </div>
 </div>
@@ -285,9 +330,9 @@ if ($authed) {
 <div class="admin-page">
 
   <header class="admin-header">
-    <div class="admin-title">Dad-a-Base Admin</div>
+    <span class="room-name">Dad-a-Base Admin</span>
     <nav class="admin-nav">
-      <span style="font-size:0.82rem;color:rgba(255,255,255,0.4)">
+      <span style="font-family:var(--font-body);font-size:var(--text-xs);color:rgba(250,247,242,0.4)">
         <?= count($approved) ?> approved &nbsp;·&nbsp;
         <?= count($pending) ?> pending &nbsp;·&nbsp;
         <?= $totalVotes ?> votes
@@ -302,16 +347,16 @@ if ($authed) {
   <main class="admin-main">
 
     <!-- ─── AI Categorize Toolbar ──────────────────────────────────── -->
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:40px;padding:20px 24px;background:var(--warm-white);border:1px solid var(--sand);border-radius:var(--radius)">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;margin-bottom:2.5rem;padding:1.25rem 1.5rem;background:var(--white-soft);border:1px solid var(--rule);border-radius:var(--radius)">
       <div>
-        <div style="font-family:var(--font-display);font-size:1rem;color:var(--espresso);margin-bottom:4px">AI Category Assignment</div>
-        <div style="font-size:0.82rem;color:var(--taupe)">Assign categories to uncategorized jokes in batches of 50, or per-joke using the ✦ button in the tables below. Each joke may receive multiple categories.</div>
+        <div style="font-family:var(--font-display);font-size:var(--text-base);color:var(--text);margin-bottom:0.25rem">AI Category Assignment</div>
+        <div style="font-family:var(--font-body);font-size:var(--text-xs);color:var(--text-muted)">Assign categories to uncategorized jokes in batches of 50, or per-joke using the ✦ button in the tables below. Each joke may receive multiple categories.</div>
       </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.5rem">
         <button class="btn btn-primary" id="cat-batch-btn" onclick="startChunkedCategorize()" style="white-space:nowrap">
           ✦ Categorize Uncategorized
         </button>
-        <div id="cat-progress" style="display:none;font-size:0.82rem;color:var(--taupe);text-align:right"></div>
+        <div id="cat-progress" style="display:none;font-family:var(--font-body);font-size:var(--text-xs);color:var(--text-muted);text-align:right"></div>
       </div>
     </div>
 
@@ -319,22 +364,22 @@ if ($authed) {
     <h2 class="admin-section-title">
       Pending Review
       <?php if (count($pending) > 0): ?>
-        <span style="font-size:0.85rem;color:var(--accent);font-family:var(--font-body);font-weight:400;margin-left:12px"><?= count($pending) ?> awaiting</span>
+        <span style="font-size:var(--text-sm);color:var(--burg);font-family:var(--font-body);font-weight:400;margin-left:0.75rem"><?= count($pending) ?> awaiting</span>
       <?php endif ?>
     </h2>
 
     <?php if (empty($pending)): ?>
-      <p style="color:var(--taupe);font-size:0.9rem;margin-bottom:48px">All clear — no pending submissions.</p>
+      <p style="color:var(--text-muted);font-size:var(--text-xs);margin-bottom:3rem">All clear — no pending submissions.</p>
     <?php else: ?>
-    <div class="admin-table-wrap" style="margin-bottom:48px">
-      <table class="admin-table">
+    <div class="admin-table-wrap" style="margin-bottom:3rem">
+      <table class="admin-table" id="table-pending">
         <thead>
           <tr>
-            <th>Setup</th>
-            <th>Punchline</th>
-            <th>Submitted by</th>
-            <th>Categories</th>
-            <th>Date</th>
+            <th class="sortable" data-col="0">Setup</th>
+            <th class="sortable" data-col="1">Punchline</th>
+            <th class="sortable" data-col="2">Submitted by</th>
+            <th class="sortable" data-col="3">Categories</th>
+            <th class="sortable" data-col="4">Date</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -342,13 +387,13 @@ if ($authed) {
           <?php foreach ($pending as $j): ?>
           <?php $cats = parseCategories($j['category'] ?? null); ?>
           <tr id="joke-row-<?= $j['id'] ?>">
-            <td style="max-width:200px"><?= htmlspecialchars($j['setup']) ?></td>
-            <td style="max-width:200px;color:var(--brown);font-style:italic"><?= htmlspecialchars($j['punchline']) ?></td>
+            <td style="max-width:12.5rem"><?= htmlspecialchars($j['setup']) ?></td>
+            <td style="max-width:12.5rem;color:var(--text-muted);font-style:italic"><?= htmlspecialchars($j['punchline']) ?></td>
             <td><?= htmlspecialchars($j['submitted_by'] ?: 'Anonymous') ?></td>
             <td>
               <span class="joke-cat-cell" id="cat-<?= $j['id'] ?>">
                 <?php if (empty($cats)): ?>
-                  <em style="font-size:0.8rem;color:var(--taupe)">None</em>
+                  <em style="font-size:var(--text-xs);color:var(--text-muted)">None</em>
                 <?php else: ?>
                   <?php foreach ($cats as $c): ?>
                     <span class="cat-badge-mini"><?= htmlspecialchars($c) ?></span>
@@ -356,7 +401,7 @@ if ($authed) {
                 <?php endif ?>
               </span>
             </td>
-            <td style="color:var(--taupe);white-space:nowrap;font-size:0.8rem"><?= date('M j, Y', strtotime($j['created_at'])) ?></td>
+            <td style="color:var(--text-muted);white-space:nowrap;font-size:var(--text-xs)" data-sort="<?= strtotime($j['created_at']) ?>"><?= date('M j, Y', strtotime($j['created_at'])) ?></td>
             <td>
               <div class="admin-action-group">
                 <form method="POST" style="display:inline">
@@ -384,18 +429,18 @@ if ($authed) {
     <h2 class="admin-section-title">Approved Jokes</h2>
 
     <?php if (empty($approved)): ?>
-      <p style="color:var(--taupe);font-size:0.9rem">No approved jokes yet. Approve some above!</p>
+      <p style="color:var(--text-muted);font-size:var(--text-xs)">No approved jokes yet. Approve some above!</p>
     <?php else: ?>
     <div class="admin-table-wrap">
-      <table class="admin-table">
+      <table class="admin-table" id="table-approved">
         <thead>
           <tr>
-            <th>#</th>
-            <th>Setup</th>
-            <th>Punchline</th>
-            <th>By</th>
-            <th>Categories</th>
-            <th>Votes</th>
+            <th class="sortable" data-col="0">#</th>
+            <th class="sortable" data-col="1">Setup</th>
+            <th class="sortable" data-col="2">Punchline</th>
+            <th class="sortable" data-col="3">By</th>
+            <th class="sortable" data-col="4">Categories</th>
+            <th class="sortable" data-col="5" data-sort-type="votes">Votes</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -403,14 +448,14 @@ if ($authed) {
           <?php foreach ($approved as $j): ?>
           <?php $cats = parseCategories($j['category'] ?? null); ?>
           <tr id="joke-row-<?= $j['id'] ?>">
-            <td style="color:var(--taupe);font-size:0.8rem"><?= $j['id'] ?></td>
-            <td style="max-width:180px"><?= htmlspecialchars($j['setup']) ?></td>
-            <td style="max-width:180px;color:var(--brown);font-style:italic"><?= htmlspecialchars($j['punchline']) ?></td>
-            <td style="font-size:0.82rem;color:var(--taupe)"><?= htmlspecialchars($j['submitted_by'] ?: 'Anon') ?></td>
+            <td style="color:var(--text-muted);font-size:var(--text-xs)" data-sort="<?= $j['id'] ?>"><?= $j['id'] ?></td>
+            <td style="max-width:11.25rem"><?= htmlspecialchars($j['setup']) ?></td>
+            <td style="max-width:11.25rem;color:var(--text-muted);font-style:italic"><?= htmlspecialchars($j['punchline']) ?></td>
+            <td style="font-size:var(--text-xs);color:var(--text-muted)"><?= htmlspecialchars($j['submitted_by'] ?: 'Anon') ?></td>
             <td>
               <span class="joke-cat-cell" id="cat-<?= $j['id'] ?>">
                 <?php if (empty($cats)): ?>
-                  <em style="font-size:0.8rem;color:var(--taupe)">None</em>
+                  <em style="font-size:var(--text-xs);color:var(--text-muted)">None</em>
                 <?php else: ?>
                   <?php foreach ($cats as $c): ?>
                     <span class="cat-badge-mini"><?= htmlspecialchars($c) ?></span>
@@ -418,7 +463,7 @@ if ($authed) {
                 <?php endif ?>
               </span>
             </td>
-            <td>
+            <td data-sort="<?= $j['ha_count'] + $j['groan_count'] ?>">
               <div class="stats-row">
                 <span class="stat-pill stat-ha">😄 <?= $j['ha_count'] ?></span>
                 <span class="stat-pill stat-groan">😩 <?= $j['groan_count'] ?></span>
@@ -452,7 +497,7 @@ if ($authed) {
 // ── Render mini category badges into a cell ─────────────────────────
 function renderCatBadges(categories) {
   if (!categories || categories.length === 0) {
-    return '<em style="font-size:0.8rem;color:var(--taupe)">None</em>';
+    return '<em style="font-size:var(--text-xs);color:var(--text-muted)">None</em>';
   }
   return categories.map(function(c) {
     return '<span class="cat-badge-mini">' + escHtml(c) + '</span>';
@@ -551,11 +596,71 @@ function showToast(msg) {
   setTimeout(function() { t.classList.remove('show'); }, 3500);
 }
 
+// ── Sortable tables ──────────────────────────────────────────────────
+// State: { tableId -> { col: N, dir: 'asc'|'desc' } }
+var sortState = {};
+
+function getCellValue(row, colIndex) {
+  var cell = row.cells[colIndex];
+  if (!cell) { return ''; }
+  // Prefer data-sort attribute (set on numeric/date cells in PHP)
+  if (cell.dataset.sort !== undefined) { return cell.dataset.sort; }
+  return cell.textContent.trim().toLowerCase();
+}
+
+function sortTable(table, th) {
+  var colIndex = parseInt(th.dataset.col, 10);
+  var tableId  = table.id;
+  var state    = sortState[tableId] || { col: -1, dir: 'asc' };
+
+  // Toggle direction if same column, else default to asc
+  var dir = (state.col === colIndex && state.dir === 'asc') ? 'desc' : 'asc';
+  sortState[tableId] = { col: colIndex, dir: dir };
+
+  // Update header indicators
+  table.querySelectorAll('th.sortable').forEach(function(h) {
+    h.classList.remove('sort-asc', 'sort-desc');
+  });
+  th.classList.add(dir === 'asc' ? 'sort-asc' : 'sort-desc');
+
+  // Collect and sort rows
+  var tbody = table.tBodies[0];
+  var rows  = Array.prototype.slice.call(tbody.rows);
+
+  rows.sort(function(a, b) {
+    var av = getCellValue(a, colIndex);
+    var bv = getCellValue(b, colIndex);
+
+    // Numeric sort if both values parse as numbers
+    var an = parseFloat(av);
+    var bn = parseFloat(bv);
+    if (!isNaN(an) && !isNaN(bn)) {
+      return dir === 'asc' ? an - bn : bn - an;
+    }
+
+    // String sort
+    return dir === 'asc'
+      ? av.localeCompare(bv)
+      : bv.localeCompare(av);
+  });
+
+  // Re-insert rows in sorted order
+  rows.forEach(function(row) { tbody.appendChild(row); });
+}
+
+// ── Escape HTML (DOM-based, bulletproof) ─────────────────────────────
 function escHtml(str) {
   var d = document.createElement('div');
   d.appendChild(document.createTextNode(String(str)));
   return d.innerHTML;
 }
+
+// Attach click handlers to all sortable headers
+document.querySelectorAll('.admin-table th.sortable').forEach(function(th) {
+  th.addEventListener('click', function() {
+    sortTable(th.closest('table'), th);
+  });
+});
 </script>
 
 <?php endif ?>

@@ -264,6 +264,7 @@ The troubleshooting process was itself instructive: subdomain document root misc
 - [ ] Joke of the Day feature
 - [ ] Daily email subscription
 - [ ] Dark mode
+- [x] Sortable admin table columns — clicking a column header (Setup, Submitted by, Date, Votes, etc.) should sort that table by that column; Actions column excluded; sort direction should toggle on repeat clicks and be indicated visually with an arrow; client-side JS sort against the already-rendered rows is sufficient, no server round-trip needed
 
 ---
 
