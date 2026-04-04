@@ -143,18 +143,19 @@ if ($authed && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['bulk_file
   <link rel="stylesheet" href="shared.css">
   <link rel="stylesheet" href="style.css">
   <style>
+    /* ── Upload zone ─────────────────────────────────────────────── */
     .upload-zone {
-      border: 2px dashed var(--sand);
+      border: 2px dashed var(--rule-strong);
       border-radius: var(--radius);
-      padding: 48px 32px;
+      padding: 3rem 2rem;
       text-align: center;
       transition: border-color var(--transition), background var(--transition);
       cursor: pointer;
       position: relative;
     }
     .upload-zone:hover, .upload-zone.drag-over {
-      border-color: var(--espresso);
-      background: var(--warm-white);
+      border-color: var(--text);
+      background: var(--white-soft);
     }
     .upload-zone input[type="file"] {
       position: absolute;
@@ -164,18 +165,91 @@ if ($authed && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['bulk_file
       width: 100%;
       height: 100%;
     }
-    .upload-icon { font-size: 2.5rem; margin-bottom: 12px; }
-    .upload-label { font-family: var(--font-display); font-size: 1.1rem; color: var(--espresso); margin-bottom: 6px; }
-    .upload-hint { font-size: 0.82rem; color: var(--taupe); }
-    .filename-display { margin-top: 14px; font-size: 0.85rem; color: var(--brown); font-weight: 500; display: none; }
-    .schema-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 12px; }
-    .schema-table th, .schema-table td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--sand); }
-    .schema-table th { background: var(--cream); color: var(--taupe); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; }
-    .schema-table code { font-family: monospace; background: rgba(44,31,22,0.06); padding: 2px 6px; border-radius: 4px; }
-    .result-row { display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-radius: var(--radius-sm); margin-bottom: 8px; }
-    .result-ok   { background: rgba(74,124,111,0.1);  border: 1px solid rgba(74,124,111,0.3); color: var(--accent-2); }
-    .result-warn { background: rgba(200,85,61,0.08);  border: 1px solid rgba(200,85,61,0.25); color: var(--accent); }
-    .result-count { font-family: var(--font-display); font-size: 1.8rem; font-weight: 500; }
+    .upload-icon { font-size: var(--text-lg); margin-bottom: 0.75rem; }
+    .upload-label {
+      font-family: var(--font-display);
+      font-size: var(--text-base);
+      color: var(--text);
+      margin-bottom: 0.375rem;
+    }
+    .upload-hint { font-size: var(--text-xs); color: var(--text-muted); }
+    .filename-display {
+      margin-top: 0.875rem;
+      font-size: var(--text-sm);
+      color: var(--text);
+      font-weight: 500;
+      display: none;
+    }
+
+    /* ── Schema table ─────────────────────────────────────────────── */
+    .schema-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--text-sm);
+      margin-top: 0.75rem;
+    }
+    .schema-table th, .schema-table td {
+      text-align: left;
+      padding: 0.625rem 0.875rem;
+      border-bottom: 1px solid var(--rule);
+    }
+    .schema-table th {
+      background: var(--bg-alt);
+      color: var(--text-muted);
+      font-size: var(--text-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .schema-table code {
+      font-family: monospace;
+      background: rgba(44, 31, 20, 0.06);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+    }
+
+    /* ── Result rows ──────────────────────────────────────────────── */
+    .result-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.875rem 1.25rem;
+      border-radius: var(--radius-sm);
+      margin-bottom: 0.5rem;
+    }
+    .result-ok {
+      background: rgba(58, 92, 59, 0.08);   /* --green at 8% */
+      border: 1px solid rgba(58, 92, 59, 0.25);
+      color: var(--green);
+    }
+    .result-warn {
+      background: rgba(123, 45, 58, 0.08);   /* --burg at 8% */
+      border: 1px solid rgba(123, 45, 58, 0.25);
+      color: var(--burg);
+    }
+    .result-count {
+      font-family: var(--font-display);
+      font-size: var(--text-lg);
+      font-weight: 500;
+    }
+
+    /* ── Schema example code blocks ───────────────────────────────── */
+    .schema-example-label {
+      font-size: var(--text-xs);
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+    .schema-example-pre {
+      background: var(--white-soft);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-sm);
+      padding: 0.875rem;
+      font-size: var(--text-xs);
+      overflow-x: auto;
+      color: var(--text);
+    }
   </style>
 </head>
 <body>
@@ -196,7 +270,7 @@ if ($authed && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['bulk_file
       </div>
       <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:4px">Sign In →</button>
     </form>
-    <div style="margin-top:24px"><a href="index.php" style="font-size:0.82rem;color:var(--taupe);text-decoration:none">← Back to Dad-a-Base</a></div>
+    <div style="margin-top:1.5rem"><a href="index.php" style="font-size:var(--text-xs);color:var(--text-muted);text-decoration:none">← Back to Dad-a-Base</a></div>
   </div>
 </div>
 
@@ -244,7 +318,7 @@ if ($authed && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['bulk_file
     <?php else: ?>
     <!-- ─── Upload Form ── -->
     <h2 class="admin-section-title" style="margin-bottom:8px">Import Jokes</h2>
-    <p style="color:var(--taupe);font-size:0.9rem;margin-bottom:32px">Upload a CSV or JSON file to add many jokes at once. Duplicates are not checked — review before importing.</p>
+    <p style="color:var(--text-muted);font-size:var(--text-sm);margin-bottom:2rem">Upload a CSV or JSON file to add many jokes at once. Duplicates are not checked — review before importing.</p>
 
     <form method="POST" enctype="multipart/form-data">
 
@@ -259,22 +333,22 @@ if ($authed && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['bulk_file
       <div class="field" style="margin-top:28px">
         <label>Import status</label>
         <div style="display:flex;gap:16px;margin-top:8px">
-          <label style="display:flex;align-items:center;gap:8px;font-weight:400;font-size:0.9rem;cursor:pointer">
+          <label style="display:flex;align-items:center;gap:8px;font-weight:400;font-size:var(--text-sm);cursor:pointer">
             <input type="radio" name="import_status" value="pending" checked> Add to moderation queue
           </label>
-          <label style="display:flex;align-items:center;gap:8px;font-weight:400;font-size:0.9rem;cursor:pointer">
+          <label style="display:flex;align-items:center;gap:8px;font-weight:400;font-size:var(--text-sm);cursor:pointer">
             <input type="radio" name="import_status" value="approved"> Approve immediately
           </label>
         </div>
       </div>
 
       <div class="field" style="margin-top:4px">
-        <label style="display:flex;align-items:flex-start;gap:10px;font-weight:400;font-size:0.9rem;cursor:pointer;text-transform:none;letter-spacing:0">
+        <label style="display:flex;align-items:flex-start;gap:10px;font-weight:400;font-size:var(--text-sm);cursor:pointer;text-transform:none;letter-spacing:0">
           <input type="checkbox" name="categorize_on_import" id="categorize-on-import"
                  style="margin-top:3px;width:auto;flex-shrink:0">
           <span>
             <strong style="font-weight:500">AI-categorize on import</strong>
-            <span style="display:block;font-size:0.8rem;color:var(--taupe);margin-top:2px">
+            <span style="display:block;font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">
               Calls the Claude API for each uncategorized joke. Each joke may receive multiple categories.
               Categorized jokes are auto-approved regardless of the status setting above. Large files
               will take longer — allow up to 1 second per joke.
@@ -287,8 +361,8 @@ if ($authed && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['bulk_file
     </form>
 
     <div style="margin-top:48px">
-      <h3 style="font-family:var(--font-display);font-weight:400;font-size:1.1rem;color:var(--espresso);margin-bottom:8px">File Schema</h3>
-      <p style="font-size:0.85rem;color:var(--taupe);margin-bottom:14px">Both formats use the same four fields. <code style="font-family:monospace;background:rgba(44,31,22,0.06);padding:2px 6px;border-radius:4px">category</code> and <code style="font-family:monospace;background:rgba(44,31,22,0.06);padding:2px 6px;border-radius:4px">submitted_by</code> are optional. The <code style="font-family:monospace;background:rgba(44,31,22,0.06);padding:2px 6px;border-radius:4px">category</code> field accepts a single value, a comma-separated list, or a JSON array.</p>
+      <h3 style="font-family:var(--font-display);font-weight:400;font-size:var(--text-base);color:var(--text);margin-bottom:0.5rem">File Schema</h3>
+      <p style="font-size:var(--text-sm);color:var(--text-muted);margin-bottom:0.875rem">Both formats use the same four fields. <code style="font-family:monospace;background:rgba(44,31,20,0.06);padding:2px 6px;border-radius:var(--radius-sm)">category</code> and <code style="font-family:monospace;background:rgba(44,31,20,0.06);padding:2px 6px;border-radius:var(--radius-sm)">submitted_by</code> are optional. The <code style="font-family:monospace;background:rgba(44,31,20,0.06);padding:2px 6px;border-radius:var(--radius-sm)">category</code> field accepts a single value, a comma-separated list, or a JSON array.</p>
       <div class="admin-table-wrap">
         <table class="schema-table">
           <thead><tr><th>Field</th><th>Required</th><th>Notes</th></tr></thead>
@@ -303,14 +377,14 @@ if ($authed && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['bulk_file
 
       <div style="margin-top:24px;display:grid;grid-template-columns:1fr 1fr;gap:24px">
         <div>
-          <div style="font-size:0.75rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--taupe);margin-bottom:8px">CSV Example</div>
-          <pre style="background:var(--warm-white);border:1px solid var(--sand);border-radius:var(--radius-sm);padding:14px;font-size:0.78rem;overflow-x:auto;color:var(--brown)">setup,punchline,submitted_by,category
+          <div class="schema-example-label">CSV Example</div>
+          <pre class="schema-example-pre">setup,punchline,submitted_by,category
 "Why did the scarecrow win?","Outstanding in his field","Dad","Work &amp; Money, Wordplay &amp; Puns"
 "What do you call a fish with no eyes?","A fsh",,</pre>
         </div>
         <div>
-          <div style="font-size:0.75rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--taupe);margin-bottom:8px">JSON Example</div>
-          <pre style="background:var(--warm-white);border:1px solid var(--sand);border-radius:var(--radius-sm);padding:14px;font-size:0.78rem;overflow-x:auto;color:var(--brown)">[
+          <div class="schema-example-label">JSON Example</div>
+          <pre class="schema-example-pre">[
   {
     "setup": "Why did the scarecrow win?",
     "punchline": "Outstanding in his field",

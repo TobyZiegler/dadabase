@@ -71,50 +71,55 @@ if ($authed && isset($_GET['format'])) {
   <link rel="stylesheet" href="shared.css">
   <link rel="stylesheet" href="style.css">
   <style>
+    /* ── Download cards ───────────────────────────────────────────── */
     .download-card {
-      background: var(--warm-white);
+      background: var(--white-soft);
       border-radius: var(--radius);
-      border: 1px solid var(--sand);
-      padding: 32px;
-      margin-bottom: 20px;
+      border: 1px solid var(--rule);
+      padding: 2rem;
+      margin-bottom: 1.25rem;
     }
     .download-card-title {
       font-family: var(--font-display);
-      font-size: 1.15rem;
+      font-size: var(--text-base);
       font-weight: 400;
-      color: var(--espresso);
-      margin-bottom: 6px;
+      color: var(--text);
+      margin-bottom: 0.375rem;
     }
     .download-card-desc {
-      font-size: 0.85rem;
-      color: var(--taupe);
-      margin-bottom: 24px;
+      font-size: var(--text-sm);
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
       line-height: 1.6;
     }
     .download-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+      gap: 0.625rem;
     }
     .dl-btn {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 6px;
-      padding: 18px 12px;
+      gap: 0.375rem;
+      padding: 1.125rem 0.75rem;
       border-radius: var(--radius-sm);
-      border: 1.5px solid var(--sand);
-      background: var(--cream);
-      color: var(--brown);
+      border: 1.5px solid var(--rule);
+      background: var(--bg-alt);
+      color: var(--text);
       text-decoration: none;
-      font-size: 0.82rem;
+      font-size: var(--text-xs);
       font-weight: 500;
       transition: all var(--transition);
       text-align: center;
     }
-    .dl-btn:hover { border-color: var(--espresso); background: var(--espresso); color: white; }
-    .dl-btn .dl-icon { font-size: 1.6rem; }
-    .dl-btn .dl-label { font-family: var(--font-display); font-size: 1rem; }
+    .dl-btn:hover {
+      border-color: var(--text);
+      background: var(--text);
+      color: var(--white-soft);
+    }
+    .dl-btn .dl-icon { font-size: var(--text-lg); }
+    .dl-btn .dl-label { font-family: var(--font-display); font-size: var(--text-base); }
   </style>
 </head>
 <body>
@@ -135,7 +140,7 @@ if ($authed && isset($_GET['format'])) {
       </div>
       <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:4px">Sign In →</button>
     </form>
-    <div style="margin-top:24px"><a href="index.php" style="font-size:0.82rem;color:var(--taupe);text-decoration:none">← Back to Dad-a-Base</a></div>
+    <div style="margin-top:1.5rem"><a href="index.php" style="font-size:var(--text-xs);color:var(--text-muted);text-decoration:none">← Back to Dad-a-Base</a></div>
   </div>
 </div>
 
@@ -155,7 +160,7 @@ if ($authed && isset($_GET['format'])) {
   <main class="admin-main" style="max-width:700px">
 
     <h2 class="admin-section-title" style="margin-bottom:8px">Export Jokes</h2>
-    <p style="color:var(--taupe);font-size:0.9rem;margin-bottom:36px">Download your joke database as CSV (for spreadsheets) or JSON (for backups and imports). All exports include votes and categories.</p>
+    <p style="color:var(--text-muted);font-size:var(--text-sm);margin-bottom:2.25rem">Download your joke database as CSV (for spreadsheets) or JSON (for backups and imports). All exports include votes and categories.</p>
 
     <div class="download-card">
       <div class="download-card-title">Approved Jokes</div>

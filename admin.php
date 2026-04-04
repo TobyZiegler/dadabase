@@ -116,15 +116,6 @@ if ($authed) {
   <link rel="stylesheet" href="shared.css">
   <link rel="stylesheet" href="style.css">
   <style>
-    /* ── Admin-specific tokens ─────────────────────────────────────── */
-    :root {
-      --admin-font-display: var(--font-display);
-      --admin-font-body:    var(--font-body);
-      --admin-text-base:    var(--text-base);
-      --admin-text-sm:      var(--text-sm);
-      --admin-text-xs:      var(--text-xs);
-    }
-
     /* ── Edit modal ────────────────────────────────────────────────── */
     .modal-overlay {
       position: fixed;
@@ -148,7 +139,7 @@ if ($authed) {
     }
 
     .modal-title {
-      font-family: var(--admin-font-display);
+      font-family: var(--font-display);
       font-size: var(--text-lg);
       font-weight: 400;
       color: var(--text);
@@ -156,8 +147,8 @@ if ($authed) {
     }
 
     .modal-subtitle {
-      font-family: var(--admin-font-body);
-      font-size: var(--admin-text-sm);
+      font-family: var(--font-body);
+      font-size: var(--text-sm);
       color: var(--text-muted);
       margin-bottom: 1.75rem;
     }
@@ -170,8 +161,8 @@ if ($authed) {
 
     /* ── Admin action buttons ──────────────────────────────────────── */
     .btn-admin-edit {
-      font-family: var(--admin-font-body);
-      font-size: var(--admin-text-xs);
+      font-family: var(--font-body);
+      font-size: var(--text-xs);
       font-weight: 500;
       border: none;
       padding: 0.375rem 0.875rem;
@@ -190,8 +181,8 @@ if ($authed) {
     }
 
     .btn-admin-categorize {
-      font-family: var(--admin-font-body);
-      font-size: var(--admin-text-xs);
+      font-family: var(--font-body);
+      font-size: var(--text-xs);
       font-weight: 500;
       border: none;
       padding: 0.375rem 0.875rem;
@@ -215,8 +206,8 @@ if ($authed) {
     /* ── Mini category badges inside table cells ───────────────────── */
     .cat-badge-mini {
       display: inline-block;
-      font-family: var(--admin-font-body);
-      font-size: var(--admin-text-xs);
+      font-family: var(--font-body);
+      font-size: var(--text-xs);
       padding: 1px 0.4375rem;
       border-radius: var(--radius-pill);
       background: rgba(44, 31, 20, 0.07);
@@ -239,7 +230,7 @@ if ($authed) {
     .admin-table th.sortable::after {
       content: ' \2195';   /* ↕ unsorted indicator */
       opacity: 0.3;
-      font-size: 0.85em;
+      font-size: var(--text-xs);   /* page-specific context — em scale would cascade oddly here */
     }
 
     .admin-table th.sort-asc::after  { content: ' \2191'; opacity: 0.8; } /* ↑ */

@@ -48,7 +48,7 @@
     </button>
     <div class="spotlight-footer">
       <div class="vote-inline" id="hero-vote-group"></div>
-      <button class="next-joke" onclick="loadHeroJoke()">Next joke &rarr;</button>
+      <button class="next-joke" onclick="loadHeroJoke()">Move on to the<br>Next Joke &rarr;</button>
     </div>
   </div>
 </section>
@@ -433,7 +433,6 @@ function revealPunchline() {
 async function heroVote(type) {
   if (!heroJokeId) { return; }
   await vote(heroJokeId, type, null);
-  loadHeroJoke();
 }
 
 // ── Vote handler ─────────────────────────────────────────────────────

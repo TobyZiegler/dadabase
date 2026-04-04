@@ -8,23 +8,15 @@
   <link rel="stylesheet" href="shared.css">
   <link rel="stylesheet" href="style.css">
   <style>
-    /* ── Easy-change tokens for this page ──────────────────────────── */
-    :root {
-      --about-font-display: var(--font-display);   /* Lora — headings, blockquote */
-      --about-font-body:    var(--font-body);       /* DM Sans — all prose */
-      --about-text-base:    var(--text-base);       /* 1.3rem — UI copy, labels  */
-      --about-text-body:    var(--text-body);       /* 1.6rem — body paragraphs  */
-    }
-
     .about-main {
       max-width: 45rem;
       margin: 0 auto;
       padding: 4rem 3rem 5rem;
-      font-family: var(--about-font-body);
+      font-family: var(--font-body);
     }
 
     .about-eyebrow {
-      font-family: var(--about-font-body);
+      font-family: var(--font-body);
       font-size: var(--text-xs);
       font-weight: 500;
       letter-spacing: 0.16em;
@@ -45,13 +37,8 @@
     }
 
     .about-title {
-      font-family: var(--about-font-display);
-      font-size: clamp(2.2rem, 4vw, 3.2rem);
-      font-weight: 300;
-      letter-spacing: -0.03em;
-      color: var(--text);
+      /* h1 base styles from shared.css apply; override only layout-specific values here */
       margin-bottom: 0.75rem;
-      line-height: 1.15;
     }
 
     .about-title em {
@@ -60,8 +47,8 @@
     }
 
     .about-subtitle {
-      font-family: var(--about-font-body);
-      font-size: var(--about-text-base);
+      font-family: var(--font-body);
+      font-size: var(--text-base);
       color: var(--text-muted);
       line-height: 1.75;
       margin-bottom: 3.5rem;
@@ -73,7 +60,7 @@
     }
 
     .about-section-label {
-      font-family: var(--about-font-body);
+      font-family: var(--font-body);
       font-size: var(--text-xs);
       font-weight: 600;
       letter-spacing: 0.16em;
@@ -85,8 +72,8 @@
     }
 
     .about-section p {
-      font-family: var(--about-font-body);
-      font-size: var(--about-text-base);
+      font-family: var(--font-body);
+      font-size: var(--text-base);
       color: var(--text-muted);
       line-height: 1.8;
       margin-bottom: 1rem;
@@ -106,7 +93,7 @@
       width: 100%;
       border-collapse: collapse;
       margin-top: 0.5rem;
-      font-family: var(--about-font-body);
+      font-family: var(--font-body);
     }
 
     .stack-table tr {
@@ -119,7 +106,7 @@
 
     .stack-table td {
       padding: 0.75rem 0;
-      font-size: var(--about-text-base);
+      font-size: var(--text-base);
       vertical-align: top;
     }
 
@@ -136,8 +123,8 @@
     }
 
     .stack-note {
-      font-family: var(--about-font-body);
-      font-size: var(--about-text-base);
+      font-family: var(--font-body);
+      font-size: var(--text-base);
       color: var(--text-muted);
       font-style: italic;
       margin-top: 1rem;
@@ -148,7 +135,7 @@
       list-style: none;
       padding: 0;
       margin: 0;
-      font-family: var(--about-font-body);
+      font-family: var(--font-body);
     }
 
     .feature-list li {
@@ -157,7 +144,7 @@
       align-items: baseline;
       padding: 0.625rem 0;
       border-bottom: 1px solid var(--rule);
-      font-size: var(--about-text-base);
+      font-size: var(--text-base);
       color: var(--text-muted);
       line-height: 1.5;
     }
@@ -186,7 +173,7 @@
       border: 1.5px solid var(--rule);
       border-radius: var(--radius);
       padding: 1.25rem 1.5rem;
-      font-family: var(--about-font-body);
+      font-family: var(--font-body);
     }
 
     .obstacle-label {
@@ -199,7 +186,7 @@
     }
 
     .obstacle-desc {
-      font-size: var(--about-text-base);
+      font-size: var(--text-base);
       color: var(--text-muted);
       line-height: 1.65;
     }
@@ -212,11 +199,11 @@
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
-      font-family: var(--about-font-body);
+      font-family: var(--font-body);
     }
 
     .next-list li {
-      font-size: var(--about-text-base);
+      font-size: var(--text-base);
       color: var(--text-muted);
       padding: 0.5rem 0;
       border-bottom: 1px solid var(--rule);
@@ -247,7 +234,7 @@
     }
 
     .closing-quote blockquote {
-      font-family: var(--about-font-display);
+      font-family: var(--font-display);
       font-size: var(--text-lg);
       font-weight: 400;
       font-style: italic;
@@ -257,8 +244,8 @@
     }
 
     .closing-quote cite {
-      font-family: var(--about-font-body);
-      font-size: var(--about-text-base);
+      font-family: var(--font-body);
+      font-size: var(--text-base);
       color: var(--text-muted);
       font-style: normal;
     }
@@ -303,7 +290,7 @@
     <div class="about-section-label">The Origin</div>
     <p>
       The Dad-a-Base is the first showcase project for
-      <a href="https://tobyziegler.com" style="color:var(--accent);text-decoration:none;font-weight:500">TobyZiegler.com</a>
+      <a href="https://tobyziegler.com" style="color:var(--burg);text-decoration:none;font-weight:500">TobyZiegler.com</a>
        &mdash; a portfolio site for a graphic designer with 30+ years of professional experience
       who decided to learn AI-assisted software engineering.
     </p>
@@ -393,7 +380,7 @@
           The subdomain was created in cPanel but its document root wasn&rsquo;t
           properly wired to Apache&rsquo;s virtual host configuration. Deleting and
           recreating the subdomain from scratch resolved it &mdash; diagnosed by
-          creating a plain <code style="font-size:0.88em;background:var(--cream);padding:1px 6px;border-radius:4px">test.html</code> file
+          creating a plain <code style="font-size:var(--text-xs);background:var(--bg-alt);padding:1px 6px;border-radius:var(--radius-sm)">test.html</code> file
           and confirming whether the server could find it at all.
         </div>
       </div>
@@ -401,8 +388,8 @@
         <div class="obstacle-label">The Namecheap Prefix Convention</div>
         <div class="obstacle-desc">
           Namecheap prepends your cPanel username to every database and user name
-          &mdash; so <code style="font-size:0.88em;background:var(--cream);padding:1px 6px;border-radius:4px">mydb</code> becomes
-          <code style="font-size:0.88em;background:var(--cream);padding:1px 6px;border-radius:4px">username_mydb</code>.
+          &mdash; so <code style="font-size:var(--text-xs);background:var(--bg-alt);padding:1px 6px;border-radius:var(--radius-sm)">mydb</code> becomes
+          <code style="font-size:var(--text-xs);background:var(--bg-alt);padding:1px 6px;border-radius:var(--radius-sm)">username_mydb</code>.
           Not prominently documented anywhere. Once discovered, it took about
           thirty seconds to fix.
         </div>
@@ -411,7 +398,7 @@
         <div class="obstacle-label">JavaScript &amp; PHP Mixing</div>
         <div class="obstacle-desc">
           The original architecture embedded AJAX endpoints inside
-          <code style="font-size:0.88em;background:var(--cream);padding:1px 6px;border-radius:4px">index.php</code>,
+          <code style="font-size:var(--text-xs);background:var(--bg-alt);padding:1px 6px;border-radius:var(--radius-sm)">index.php</code>,
           which meant apostrophes in joke content could silently crash the entire
           JavaScript layer. The fix was to separate all data endpoints into dedicated
           PHP files and switch to DOM-based HTML escaping &mdash; making the JavaScript
@@ -421,12 +408,12 @@
       <div class="obstacle-card">
         <div class="obstacle-label">Credentials in Version Control</div>
         <div class="obstacle-desc">
-          During deployment of the multi-category update, <code style="font-size:0.88em;background:var(--cream);padding:1px 6px;border-radius:4px">db.php</code>
+          During deployment of the multi-category update, <code style="font-size:var(--text-xs);background:var(--bg-alt);padding:1px 6px;border-radius:var(--radius-sm)">db.php</code>
           &mdash; the file containing the database password and Anthropic API key &mdash;
           was accidentally committed to the public GitHub repository. GitHub&rsquo;s secret
           scanning caught it immediately and blocked the push. The commit was surgically
           removed from history, the credentials were rotated, and
-          <code style="font-size:0.88em;background:var(--cream);padding:1px 6px;border-radius:4px">db.php</code> was
+          <code style="font-size:var(--text-xs);background:var(--bg-alt);padding:1px 6px;border-radius:var(--radius-sm)">db.php</code> was
           permanently removed from Git tracking. A lesson learned once, remembered permanently.
         </div>
       </div>
@@ -437,7 +424,7 @@
   <div class="about-section">
     <div class="about-section-label">What&rsquo;s Next</div>
     <p>The Dad-a-Base is the first of several showcase projects planned for
-    <a href="https://tobyziegler.com" style="color:var(--accent);text-decoration:none;font-weight:500">TobyZiegler.com</a>.
+    <a href="https://tobyziegler.com" style="color:var(--burg);text-decoration:none;font-weight:500">TobyZiegler.com</a>.
     Planned improvements to this project include:</p>
     <ul class="next-list">
       <li>Pagination for large joke counts</li>

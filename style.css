@@ -126,17 +126,17 @@
 }
 
 .reveal-btn {
-  margin-top: 1.5rem;
-  display: inline-flex;
+  display: block;
+  margin: 1.5rem auto 0;
   align-items: center;
   gap: 0.5rem;
   font-family: var(--font-body);
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
   font-weight: 500;
   color: var(--green);
   background: rgba(58, 92, 59, 0.08);
   border: none;
-  padding: 0.625rem 1.25rem;
+  padding: 1.125rem 2.5rem;
   border-radius: var(--radius-pill);
   cursor: pointer;
   transition: all var(--transition);
@@ -152,6 +152,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.75rem;
 }
 
 .vote-inline {
@@ -177,20 +178,31 @@
 .vote-btn-sm.groan:hover    { border-color: var(--burg); color: var(--burg); }
 
 .next-joke {
-  font-size: var(--text-sm);
-  color: var(--text-muted);
-  cursor: pointer;
-  background: none;
-  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  max-width: 9rem;
   font-family: var(--font-body);
-  transition: color var(--transition);
-  text-decoration: underline;
-  text-decoration-color: transparent;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--white-soft);
+  background: var(--green);
+  border: 0.2em solid var(--green);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: background 0.22s, color 0.22s, border-color 0.22s, transform 0.18s;
+  text-align: center;
+  line-height: 1.3;
+  white-space: normal;
 }
 
 .next-joke:hover {
-  color: var(--text);
-  text-decoration-color: var(--text);
+  background: transparent;
+  color: var(--green);
+  transform: translateY(-2px);
 }
 
 
