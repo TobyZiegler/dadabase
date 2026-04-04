@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dad-a-Base — The World's Finest Dad Joke Database</title>
   <meta name="description" content="A lovingly curated collection of the world's finest dad jokes. Search, vote, and submit your own.">
-  <link rel="stylesheet" href="https://tobyziegler.com/assets/shared.css">
+  <link rel="stylesheet" href="../public_html/assets/shared.css">
   <link rel="stylesheet" href="style.css"></head>
 <body>
 
