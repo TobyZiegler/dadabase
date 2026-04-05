@@ -140,7 +140,7 @@ if ($authed && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['bulk_file
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bulk Upload — Dad-a-Base</title>
-  <link rel="stylesheet" href="../public_html/assets/shared.css">
+  <link rel="stylesheet" href="https://tobyziegler.com/assets/shared.css">
   <link rel="stylesheet" href="style.css">
   <style>
     /* ── Upload zone ─────────────────────────────────────────────── */

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>How This Was Built — Dad-a-Base</title>
   <meta name="description" content="The origin story, design philosophy, and methodology behind the Dad-a-Base — built through AI-assisted engineering without writing a single line of code by hand.">
-  <link rel="stylesheet" href="../public_html/assets/shared.css">
+  <link rel="stylesheet" href="https://tobyziegler.com/assets/shared.css">
   <link rel="stylesheet" href="style.css">
   <style>
     .about-main {
