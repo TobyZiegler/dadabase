@@ -5,6 +5,7 @@
 
 # Credentials — never commit these
 db.php
+uploads_to_server
 
 # Database schema — run manually, never auto-deploy
 # (Uncomment to keep setup.sql out of git entirely; or leave it tracked for docs)
@@ -16,6 +17,7 @@ setup_admin.php
 
 # Stored Jokes
 scraping/*.csv
+tobyjhmw_dadabase.sql
 
 # Editor directories
 .idea/

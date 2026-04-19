@@ -17,6 +17,7 @@
   </a>
   <nav class="header-nav">
     <button onclick="revealArchive()" id="nav-show-all-btn" class="nav-link" style="background:none;border:none;cursor:pointer;font-size:inherit;">Show Them All</button>
+    <a href="https://resume.tobyziegler.com" class="nav-link">R&eacute;sum&eacute;</a>
     <a href="submit.php" class="btn-nav">Submit a Joke →</a>
   </nav>
 </header>
@@ -41,11 +42,13 @@
   <div class="joke-spotlight">
     <div class="spotlight-label">Joke of the Moment</div>
     <div id="hero-setup">Loading...</div>
-    <div id="hero-punchline"></div>
-    <button class="reveal-btn" id="reveal-btn" onclick="revealPunchline()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-      Reveal punchline
-    </button>
+    <div class="punchline-stage">
+      <div id="hero-punchline"></div>
+      <button class="reveal-btn" id="reveal-btn" onclick="revealPunchline()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        Reveal punchline
+      </button>
+    </div>
     <div class="spotlight-footer">
       <div class="vote-inline" id="hero-vote-group"></div>
       <button class="next-joke" onclick="loadHeroJoke()">Move on to the<br>Next Joke &rarr;</button>
@@ -112,7 +115,9 @@
     <a href="submit.php" class="footer-link">Submit a Joke</a>
     <a href="about.php" class="footer-link">How This Was Built</a>
     <a href="admin.php" class="footer-link">Admin</a>
-    <a href="https://tobyziegler.com" class="footer-link" target="_blank">TobyZiegler.com</a>
+    <a href="https://tobyziegler.com" class="footer-link">The Study</a>
+    <a href="https://projects.tobyziegler.com" class="footer-link">Projects</a>
+    <a href="https://resume.tobyziegler.com" class="footer-link">R&eacute;sum&eacute;</a>
   </nav>
 </footer>
 

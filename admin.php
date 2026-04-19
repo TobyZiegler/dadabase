@@ -323,7 +323,7 @@ if ($authed) {
   <header class="admin-header">
     <span class="room-name">Dad-a-Base Admin</span>
     <nav class="admin-nav">
-      <span style="font-family:var(--font-body);font-size:var(--text-xs);color:rgba(250,247,242,0.4)">
+      <span style="font-family:var(--font-body);font-size:var(--text-xs);color:var(--text-muted)">
         <?= count($approved) ?> approved &nbsp;·&nbsp;
         <?= count($pending) ?> pending &nbsp;·&nbsp;
         <?= $totalVotes ?> votes

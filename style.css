@@ -110,13 +110,24 @@
   min-height: 4rem;
 }
 
+/* Shared container — punchline and reveal button occupy the same space.
+   The button is centered absolutely; the punchline lives in normal flow.
+   Both sit within a consistent min-height so the layout never jumps. */
+.punchline-stage {
+  position: relative;
+  min-height: 4rem;             /* enough room for the button + a typical punchline */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.25rem;
+}
+
 #hero-punchline {
   font-size: var(--text-base);
   color: var(--text-muted);
   font-style: italic;
   font-weight: 400;
-  position: relative;
-  min-height: 3rem;
+  text-align: center;
   opacity: 0;
   transition: opacity 0.5s ease;
 }
@@ -126,15 +137,19 @@
 }
 
 .reveal-btn {
-  display: block;
-  margin: 1.5rem auto 0;
+  position: absolute;           /* floats exactly over the punchline's space */
+  inset: 0;
+  margin: auto;
+  width: fit-content;
+  height: fit-content;
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   font-family: var(--font-body);
   font-size: var(--text-base);
   font-weight: 500;
   color: var(--green);
-  background: rgba(58, 92, 59, 0.08);
+  background: rgba(58, 92, 59, 0.08);   /* --green at 8% opacity */
   border: none;
   padding: 1.125rem 2.5rem;
   border-radius: var(--radius-pill);
@@ -143,7 +158,7 @@
 }
 
 .reveal-btn:hover {
-  background: rgba(58, 92, 59, 0.15);
+  background: rgba(58, 92, 59, 0.15);   /* --green at 15% opacity */
   transform: translateY(-1px);
 }
 
@@ -182,7 +197,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.6rem;
-  max-width: 9rem;
+  max-width: 16rem;
   font-family: var(--font-body);
   font-size: var(--text-sm);
   font-weight: 600;
@@ -662,11 +677,16 @@ body.archive-open #browse {
 
 
 /* ─── Admin Panel ───────────────────────────────────────────────────── */
-.admin-page { min-height: 100vh; background: var(--bg); }
+/* Transparent so body parchment shows through on both login and dashboard */
+.admin-page { min-height: 100vh; background: transparent; }
 
 .admin-header {
-  background: var(--bg-dark);
-  color: var(--white-soft);
+  /* Matches .site-header frosted-glass treatment from shared.css */
+  background: rgba(245, 240, 232, 0.3);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--rule);
+  color: var(--text);
   padding: 1.25rem 3rem;
   display: flex;
   align-items: center;
@@ -676,18 +696,19 @@ body.archive-open #browse {
   z-index: 100;
 }
 
-/* .room-name on dark background needs a color override */
-.admin-header .room-name { color: var(--white-soft); }
+/* .room-name uses var(--text) by default — no override needed on light header */
 
 .admin-nav a {
+  font-family: var(--font-body);
   font-size: var(--text-sm);
-  color: rgba(250, 247, 242, 0.6);
+  font-weight: 500;
+  color: var(--text-muted);
   text-decoration: none;
   margin-left: 1.5rem;
   transition: color var(--transition);
 }
 
-.admin-nav a:hover { color: var(--white-soft); }
+.admin-nav a:hover { color: var(--text); }
 
 .admin-main {
   max-width: 144rem;
@@ -790,6 +811,7 @@ body.archive-open #browse {
   align-items: center;
   justify-content: center;
   padding: 2.5rem 1.5rem;
+  background: transparent;   /* body parchment shows through */
 }
 
 .login-card {
